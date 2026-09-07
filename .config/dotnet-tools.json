@@ -1,0 +1,30 @@
+{
+  "isRoot": true,
+  "version": 1,
+  "tools": {
+    "coverlet.console": {
+      "commands": [
+        "coverlet"
+      ],
+      "version": "10.0.1"
+    },
+    "dotnet-reportgenerator-globaltool": {
+      "commands": [
+        "reportgenerator"
+      ],
+      "version": "5.5.10"
+    },
+    "microsoft.openapi.kiota": {
+      "commands": [
+        "kiota"
+      ],
+      "version": "1.29.0"
+    },
+    "api.scripts": {
+      "commands": [
+        "api-scripts"
+      ],
+      "version": "1.3.7"
+    }
+  }
+}

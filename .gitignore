@@ -1,0 +1,21 @@
+[Bb]in/
+[Oo]bj/
+.vs/
+.vscode/
+TestResults/
+coverage-reports/
+*.user
+*.suo
+.idea/
+.env
+**/.env
+
+# Ephemeral OpenAPI + Kiota client (api-scripts generate-client / test-functional)
+docs/openapi/apis/**/*.json
+clients/
+
+# Firebase service account
+firebase_service_account.json
+**/firebase_service_account.json
+artifacts/
+

@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Media.csproj" />
+  </Folder>
+  <Folder Name="/src/API/">
+    <Project Path="src/API/Media.API.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/Functional/">
+    <Project Path="tests/Functional/Media.Functional.csproj" />
+  </Folder>
+  <Folder Name="/tests/Unit/">
+    <Project Path="tests/Unit/Media.Unit.csproj" />
+  </Folder>
+</Solution>

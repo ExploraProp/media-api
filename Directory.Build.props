@@ -1,0 +1,91 @@
+<Project>
+  <!-- Standalone defaults when this folder is the repo / Docker context root. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <NullableReferenceTypesAnnotations>true</NullableReferenceTypesAnnotations>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <!-- Security pins only when standalone (monorepo bridge pulls root Directory.Build.props). -->
+  <ItemGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props')">
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="10.0.9" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.10" />
+    <PackageReference Include="Microsoft.OpenApi" Version="2.7.5" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props')">
+    <NoWarn>$(NoWarn);NU1510</NoWarn>
+  </PropertyGroup>
+
+  <!-- Standalone unit-test conventions (monorepo uses services/Directory.Build.props instead). -->
+  <PropertyGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props') And $(MSBuildProjectName.EndsWith('.Unit'))">
+    <IsTestProject>true</IsTestProject>
+    <TestingPlatformShowTestsFailure>true</TestingPlatformShowTestsFailure>
+    <SonarQubeTestProject>true</SonarQubeTestProject>
+  </PropertyGroup>
+
+  <ItemGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props') And $(MSBuildProjectName.EndsWith('.Unit'))">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.0" />
+    <PackageReference Include="Moq" Version="4.20.72" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+    <Using Include="SharedKernel.Testing" />
+    <Using Include="System.Threading.Tasks" />
+    <Using Include="Microsoft.EntityFrameworkCore" />
+    <Using Include="SharedKernel.Kernel.Results" />
+    <Using Include="System.Linq.Expressions" />
+    <Using Include="Moq" />
+    <Using Include="Microsoft.Extensions.DependencyInjection" />
+    <Using Include="Microsoft.Extensions.Logging" />
+    <Using Include="Microsoft.Extensions.Configuration" />
+    <Using Include="Microsoft.Extensions.Options" />
+    <Using Include="System.Net" />
+    <Using Include="System.Reflection" />
+    <Using Include="Microsoft.AspNetCore.Http" />
+  </ItemGroup>
+
+  <!-- Standalone functional-test conventions. -->
+  <PropertyGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props') And $(MSBuildProjectName.EndsWith('.Functional'))">
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <SonarQubeTestProject>true</SonarQubeTestProject>
+    <UserSecretsId>inmo-functional-tests</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props') And $(MSBuildProjectName.EndsWith('.Functional'))">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="Reqnroll" Version="2.2.0" />
+    <PackageReference Include="Reqnroll.MSTest" Version="2.2.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.6.3" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.6.3" />
+    <PackageReference Include="FluentAssertions" Version="6.12.2" />
+  </ItemGroup>
+
+  <ItemGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props') And $(MSBuildProjectName.EndsWith('.API'))">
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <!-- OpenAPI on build boots Startup (Redis, etc.). Generate via api-scripts instead. -->
+  <PropertyGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props') And $(MSBuildProjectName.EndsWith('.API'))">
+    <OpenApiGenerateDocumentsOnBuild>false</OpenApiGenerateDocumentsOnBuild>
+  </PropertyGroup>
+
+  <!-- Standalone BC repos: architecture analyzers from GitHub Packages. -->
+  <PropertyGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props')">
+    <ArchitecturePackageVersion Condition="'$(ArchitecturePackageVersion)' == ''">2.0.0</ArchitecturePackageVersion>
+  </PropertyGroup>
+
+  <ItemGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props') And !$(MSBuildProjectName.EndsWith('.Unit')) And !$(MSBuildProjectName.EndsWith('.Functional'))">
+    <PackageReference Include="Architecture" Version="$(ArchitecturePackageVersion)" PrivateAssets="all" />
+  </ItemGroup>
+  <!-- Monorepo bridge: shared analyzers / test conventions when still under services/ -->
+  <Import Project="$(MSBuildThisFileDirectory)../Directory.Build.props"
+          Condition="Exists('$(MSBuildThisFileDirectory)../Directory.Build.props')" />
+</Project>
