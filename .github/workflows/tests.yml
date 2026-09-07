@@ -141,8 +141,11 @@ jobs:
           ASPNETCORE_ENVIRONMENT: Testing
           NUGET_AUTH_TOKEN: ${{ secrets.NUGET_AUTH_TOKEN }}
           SIBLING_IMAGE_TAG: main
+          FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
         run: |
           set -euo pipefail
+          export MEDIA_WATERMARK_PATH="${GITHUB_WORKSPACE}/src/API/Assets/watermark.png"
           dotnet tool run api-scripts -- test-functional --service-root .
 
       - name: 📊 Upload functional coverage
