@@ -1,0 +1,13 @@
+<Project Sdk="MSTest.Sdk/3.6.4">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Media.csproj" />
+    <PackageReference Include="SharedKernel.Testing" Version="2.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Remove="SharedKernel.Kernel.Common" />
+    <Using Include="SharedKernel.Kernel.Results" />
+  </ItemGroup>
+
+</Project>
