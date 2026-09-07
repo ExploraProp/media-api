@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Media error catalog</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; color: #1a1a1a; }
+    h1 { font-size: 1.75rem; }
+    h2 { margin-top: 2rem; border-bottom: 1px solid #ddd; padding-bottom: 0.25rem; }
+    table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+    th, td { border: 1px solid #ddd; padding: 0.5rem 0.75rem; text-align: left; }
+    th { background: #f5f5f5; }
+    code { font-family: ui-monospace, monospace; font-size: 0.9em; }
+    .status { font-weight: 600; }
+    .muted { color: #666; font-size: 0.95rem; }
+  </style>
+</head>
+<body>
+  <h1>Media error catalog</h1>
+  <p class="muted">Language-agnostic <code>Code</code> + HTTP status. Human titles from resx (en).</p>
+  <h2>Entity errors</h2>
+  <table>
+    <thead><tr><th>Member</th><th>Code</th><th>HTTP</th><th>en Title</th></tr></thead>
+    <tbody>
+      <tr><td><code>MediaFileError.NotApproved</code></td><td><code>MediaFile.Status.Approved.Required</code></td><td class="status">404 NotFound</td><td>File is not approved</td></tr>
+      <tr><td><code>MediaFileError.NotPending</code></td><td><code>MediaFile.Status.Pending.Required</code></td><td class="status">409 Conflict</td><td>File is not pending</td></tr>
+      <tr><td><code>MediaFileError.NotScanning</code></td><td><code>MediaFile.Status.Scanning.Required</code></td><td class="status">409 Conflict</td><td>File is not being scanned</td></tr>
+      <tr><td><code>MediaFileError.OngoingScanning</code></td><td><code>MediaFile.Status.Scanning</code></td><td class="status">409 Conflict</td><td>File is being scanned</td></tr>
+      <tr><td><code>MediaFileError.Permission</code></td><td><code>MediaAccess.Owner.Invalid</code></td><td class="status">403 Forbidden</td><td>Permission denied</td></tr>
+      <tr><td><code>MediaFileError.Private</code></td><td><code>MediaFile.AccessLevel.Private</code></td><td class="status">403 Forbidden</td><td>File is private</td></tr>
+      <tr><td><code>MediaFileError.Public</code></td><td><code>MediaFile.AccessLevel.Public</code></td><td class="status">403 Forbidden</td><td>File is public</td></tr>
+      <tr><td><code>MediaPolicyError.TooLarge</code></td><td><code>MediaPolicy.MaxFileSizeBytes.TooLarge</code></td><td class="status">422 UnprocessableEntity</td><td>File is too large</td></tr>
+      <tr><td><code>MediaPolicyError.TooMany</code></td><td><code>MediaPolicy.MaxMediaCount.TooMany</code></td><td class="status">422 UnprocessableEntity</td><td>Too many media files</td></tr>
+      <tr><td><code>MediaPolicyError.UnsupportedContentType</code></td><td><code>MediaPolicy.AllowedContentTypes.Invalid</code></td><td class="status">422 UnprocessableEntity</td><td>File type is not allowed</td></tr>
+    </tbody>
+  </table>
+  <h2>Value object / enum errors</h2>
+  <table>
+    <thead><tr><th>Member</th><th>Code</th><th>HTTP</th><th>en Title</th></tr></thead>
+    <tbody>
+      <tr><td><code>AccessLevelError.Invalid</code></td><td><code>AccessLevel.InvalidFormat</code></td><td class="status">422 UnprocessableEntity</td><td>Access level is invalid</td></tr>
+      <tr><td><code>LinkError.Empty</code></td><td><code>Link.Empty</code></td><td class="status">422 UnprocessableEntity</td><td>Link is required</td></tr>
+      <tr><td><code>LinkError.InvalidFormat</code></td><td><code>Link.InvalidFormat</code></td><td class="status">422 UnprocessableEntity</td><td>Link is invalid</td></tr>
+      <tr><td><code>MediaFileSizeError.InvalidFormat</code></td><td><code>MediaFileSize.InvalidFormat</code></td><td class="status">422 UnprocessableEntity</td><td>File size is invalid</td></tr>
+      <tr><td><code>MediaMaxCountError.Invalid</code></td><td><code>MediaMaxCount.InvalidFormat</code></td><td class="status">422 UnprocessableEntity</td><td>Max media count is invalid</td></tr>
+      <tr><td><code>MediaMaxFileSizeError.NonPositive</code></td><td><code>MediaMaxFileSize.InvalidFormat</code></td><td class="status">422 UnprocessableEntity</td><td>Max file size is invalid</td></tr>
+      <tr><td><code>MediaStatusError.Invalid</code></td><td><code>MediaStatus.InvalidFormat</code></td><td class="status">422 UnprocessableEntity</td><td>Media status is invalid</td></tr>
+      <tr><td><code>MediaTypeError.Invalid</code></td><td><code>MediaType.InvalidFormat</code></td><td class="status">422 UnprocessableEntity</td><td>Media type is invalid</td></tr>
+      <tr><td><code>OwnerTypeError.Invalid</code></td><td><code>OwnerType.InvalidFormat</code></td><td class="status">422 UnprocessableEntity</td><td>Owner type is invalid</td></tr>
+      <tr><td><code>ScanAttemptCountError.Negative</code></td><td><code>ScanAttemptCount.InvalidFormat</code></td><td class="status">422 UnprocessableEntity</td><td>Scan attempt count is invalid</td></tr>
+      <tr><td><code>ScanRejectionReasonError.Invalid</code></td><td><code>ScanRejectionReason.InvalidFormat</code></td><td class="status">422 UnprocessableEntity</td><td>Scan rejection reason is invalid</td></tr>
+      <tr><td><code>StoragePathError.Empty</code></td><td><code>StoragePath.Empty</code></td><td class="status">422 UnprocessableEntity</td><td>Storage path is required</td></tr>
+      <tr><td><code>StoragePathError.InvalidFormat</code></td><td><code>StoragePath.InvalidFormat</code></td><td class="status">422 UnprocessableEntity</td><td>Storage path is invalid</td></tr>
+      <tr><td><code>StoragePathError.TooLong</code></td><td><code>StoragePath.TooLong</code></td><td class="status">422 UnprocessableEntity</td><td>Storage path is too long</td></tr>
+      <tr><td><code>VariantTypeError.Invalid</code></td><td><code>VariantType.InvalidFormat</code></td><td class="status">422 UnprocessableEntity</td><td>Variant type is invalid</td></tr>
+    </tbody>
+  </table>
+  <h2>Service errors</h2>
+  <table>
+    <thead><tr><th>Member</th><th>Code</th><th>HTTP</th><th>en Title</th></tr></thead>
+    <tbody>
+      <tr><td><code>ImageProcessingServiceError.Processing</code></td><td><code>ImageProcessingService.Response.Invalid</code></td><td class="status">500 InternalServerError</td><td>Image could not be processed</td></tr>
+      <tr><td><code>MarketingServiceError.DownstreamFailure</code></td><td><code>MarketingService.Response.Invalid</code></td><td class="status">503 ServiceUnavailable</td><td>Marketing service unavailable</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">SharedKernel <code>SharedFailures</code> (NotFound / SystemFailed / Unauthorized) are not listed here.</p>
+  <!-- Generated by ErrorCatalogGenerator. Do not edit by hand. -->
+</body>
+</html>
