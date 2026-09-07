@@ -1,0 +1,55 @@
+name: 🔒 Snyk Security Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.yml'
+      - '**/*.yaml'
+      - '**/*.json'
+      - '**/*.lock'
+      - '**/*.lock.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+env:
+  DOTNET_VERSION: '10.0.103'
+  SOLUTION: 'Media.slnx'
+
+jobs:
+  snyk-open-source:
+    name: 🔒 Snyk Open Source (.NET)
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+
+      - name: ⚙️ Setup .NET
+        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          source-url: https://nuget.pkg.github.com/ExploraProp/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.NUGET_AUTH_TOKEN }}
+
+      - name: 📦 Restore
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.NUGET_AUTH_TOKEN }}
+        run: |
+          dotnet nuget update source github-exploraprop --username github --password "$NUGET_AUTH_TOKEN" --store-password-in-clear-text
+          dotnet restore ${{ env.SOLUTION }}
+
+      - name: 🔒 Setup Snyk
+        uses: snyk/actions/setup@12140f4059e244892ae643824a95459a102120dd # master
+
+      - name: 🔒 Snyk
+        # --all-projects: root is *.slnx; Snyk only auto-detects .sln/.csproj at repo root
+        run: snyk test --all-projects --severity-threshold=high
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}

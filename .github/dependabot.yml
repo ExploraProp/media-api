@@ -1,0 +1,19 @@
+version: 2
+
+enable-beta-ecosystems: false
+
+registries:
+  github-exploraprop:
+    type: nuget-feed
+    url: https://nuget.pkg.github.com/ExploraProp/index.json
+    token: ${{secrets.NUGET_AUTH_TOKEN}}
+
+updates:
+  - package-ecosystem: "nuget"
+    directory: "/"
+    registries:
+      - github-exploraprop
+    commit-message:
+      prefix: "⬆️ "
+    schedule:
+      interval: "weekly"

@@ -1,0 +1,51 @@
+name: 🔐 Configure API env
+
+# Validates required GitHub secrets for Media and emits ASP.NET Core env
+# mappings via API.Scripts secrets-ci (github-env format).
+# Required secrets:
+# - `NUGET_AUTH_TOKEN`
+# - `FIREBASE_STORAGE_BUCKET`
+# - `FIREBASE_SERVICE_ACCOUNT_JSON`
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_VERSION: '10.0.103'
+
+jobs:
+  configure:
+    name: Validate secrets-ci
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+
+      - name: ⚙️ Setup .NET
+        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          source-url: https://nuget.pkg.github.com/ExploraProp/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.NUGET_AUTH_TOKEN }}
+
+      - name: 📦 Restore local tools
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.NUGET_AUTH_TOKEN }}
+        run: |
+          dotnet nuget update source github-exploraprop --username github --password "$NUGET_AUTH_TOKEN" --store-password-in-clear-text
+          dotnet tool restore
+
+      - name: 🔐 secrets-ci
+        shell: bash
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.NUGET_AUTH_TOKEN }}
+          FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -euo pipefail
+          dotnet tool run api-scripts -- secrets-ci --service Media --format github-env >> "$GITHUB_ENV"
+          echo "secrets-ci OK for Media"
