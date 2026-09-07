@@ -120,7 +120,7 @@ jobs:
         run: |
           set -euo pipefail
           export MEDIA_WATERMARK_PATH="${GITHUB_WORKSPACE}/src/API/Assets/watermark.png"
-          
+          dotnet tool run api-scripts -- generate-client --service Media
 
       - name: ⚙️ Restore
         run: dotnet restore ${{ env.SOLUTION }}
@@ -276,7 +276,7 @@ jobs:
         run: |
           set -euo pipefail
           export MEDIA_WATERMARK_PATH="${GITHUB_WORKSPACE}/src/API/Assets/watermark.png"
-          
+          dotnet tool run api-scripts -- generate-client --service Media
 
       - name: ⚙️ Restore
         run: dotnet restore ${{ env.SOLUTION }}
