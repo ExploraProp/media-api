@@ -228,15 +228,14 @@ public sealed class MediaUploadStepDefinitions(
         string fileName,
         string contentType)
     {
-        var body = new MultipartBody();
-        body.AddOrReplacePart("OwnerType", "text/plain", OwnerType.Listing.ToI18nCode());
-        body.AddOrReplacePart("OwnerId", "text/plain", ListingId.ToString());
-        body.AddOrReplacePart("MediaType", "text/plain", "photo");
-        body.AddOrReplacePart("File", contentType, stream, fileName);
-
-        var result = await KiotaApiCall.TryAsync(() =>
-            _mediaApi.Api.V1.Media.Upload.PostAsync(body));
-        return MapMediaResponse(result);
+        // Multipart validation errors: keep shared ApiClient so ProblemDetails field codes
+        // round-trip into FieldErrors (Kiota Media ProblemDetails lacks typed Errors).
+        return (await _apiClient.UploadMediaAsync(
+            stream,
+            fileName,
+            contentType,
+            OwnerType.Listing.ToI18nCode(),
+            ListingId)).As<MediaFileDto>();
     }
 
     private async Task<ApiResponse<MediaFileDto>> GetMediaAsync(string mediaFileId)
