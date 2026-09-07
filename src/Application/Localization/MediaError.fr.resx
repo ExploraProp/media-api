@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <data name="MediaFile.Status.Pending.Required.Title" xml:space="preserve"><value>Le fichier n est pas en attente</value></data>
+  <data name="MediaFile.Status.Pending.Required.Description" xml:space="preserve"><value>L analyse ne peut demarrer que lorsque le fichier est en attente.</value></data>
+  <data name="MediaFile.Status.Scanning.Required.Title" xml:space="preserve"><value>Le fichier n est pas en cours d analyse</value></data>
+  <data name="MediaFile.Status.Scanning.Required.Description" xml:space="preserve"><value>Cette operation exige que le fichier soit en cours d analyse.</value></data>
+  <data name="MediaFile.Status.Approved.Required.Title" xml:space="preserve"><value>Le fichier n est pas approuve</value></data>
+  <data name="MediaFile.Status.Approved.Required.Description" xml:space="preserve"><value>Le fichier media demande n a pas encore ete approuve.</value></data>
+  <data name="MediaFile.Status.Scanning.Title" xml:space="preserve"><value>Le fichier est en cours d analyse</value></data>
+  <data name="MediaFile.Status.Scanning.Description" xml:space="preserve"><value>Attendez la fin de l analyse avant de supprimer ce fichier.</value></data>
+  <data name="MediaFile.AccessLevel.Public.Title" xml:space="preserve"><value>Le fichier est public</value></data>
+  <data name="MediaFile.AccessLevel.Public.Description" xml:space="preserve"><value>Ce fichier media est public; utilisez l URL publique pour y acceder.</value></data>
+  <data name="MediaFile.AccessLevel.Private.Title" xml:space="preserve"><value>Le fichier est prive</value></data>
+  <data name="MediaFile.AccessLevel.Private.Description" xml:space="preserve"><value>Ce fichier media est prive; utilisez une URL signee pour y acceder.</value></data>
+  <data name="MediaAccess.Owner.Invalid.Title" xml:space="preserve"><value>Permission refusee</value></data>
+  <data name="MediaAccess.Owner.Invalid.Description" xml:space="preserve"><value>L utilisateur n est pas autorise a acceder ou modifier ce fichier media.</value></data>
+  <data name="MediaPolicy.MaxFileSizeBytes.TooLarge.Title" xml:space="preserve"><value>Le fichier est trop volumineux</value></data>
+  <data name="MediaPolicy.MaxFileSizeBytes.TooLarge.Description" xml:space="preserve"><value>Le fichier televerse depasse la taille maximale autorisee.</value></data>
+  <data name="MediaPolicy.MaxMediaCount.TooMany.Title" xml:space="preserve"><value>Trop de fichiers media</value></data>
+  <data name="MediaPolicy.MaxMediaCount.TooMany.Description" xml:space="preserve"><value>Le proprietaire a atteint le nombre maximal d elements media.</value></data>
+  <data name="MediaPolicy.AllowedContentTypes.Invalid.Title" xml:space="preserve"><value>Le type de fichier n est pas autorise</value></data>
+  <data name="MediaPolicy.AllowedContentTypes.Invalid.Description" xml:space="preserve"><value>Le type de fichier televerse n est pas autorise pour ce proprietaire.</value></data>
+  <data name="ImageProcessingService.Response.Invalid.Title" xml:space="preserve"><value>L image n a pas pu etre traitee</value></data>
+  <data name="ImageProcessingService.Response.Invalid.Description" xml:space="preserve"><value>Le fichier televerse n a pas pu etre traite.</value></data>
+  <data name="MarketingService.Response.Invalid.Title" xml:space="preserve"><value>Service Marketing indisponible</value></data>
+  <data name="MarketingService.Response.Invalid.Description" xml:space="preserve"><value>Le service Marketing est indisponible ou a refuse la requete interne.</value></data>
+  <data name="Link.Empty.Title" xml:space="preserve"><value>Le lien est obligatoire</value></data>
+  <data name="Link.Empty.Description" xml:space="preserve"><value>La valeur est obligatoire.</value></data>
+  <data name="Link.InvalidFormat.Title" xml:space="preserve"><value>Le lien est invalide</value></data>
+  <data name="Link.InvalidFormat.Description" xml:space="preserve"><value>Doit etre une URL HTTP ou HTTPS valide.</value></data>
+  <data name="StoragePath.Empty.Title" xml:space="preserve"><value>Le chemin de stockage est obligatoire</value></data>
+  <data name="StoragePath.Empty.Description" xml:space="preserve"><value>La valeur est obligatoire.</value></data>
+  <data name="StoragePath.TooLong.Title" xml:space="preserve"><value>Le chemin de stockage est trop long</value></data>
+  <data name="StoragePath.TooLong.Description" xml:space="preserve"><value>La valeur doit contenir au plus {0} caracteres.</value></data>
+  <data name="StoragePath.InvalidFormat.Title" xml:space="preserve"><value>Le chemin de stockage est invalide</value></data>
+  <data name="StoragePath.InvalidFormat.Description" xml:space="preserve"><value>Le chemin de stockage est invalide.</value></data>
+  <data name="MediaFileSize.InvalidFormat.Title" xml:space="preserve"><value>La taille du fichier est invalide</value></data>
+  <data name="MediaFileSize.InvalidFormat.Description" xml:space="preserve"><value>La taille du fichier doit etre superieure a zero.</value></data>
+  <data name="MediaMaxCount.InvalidFormat.Title" xml:space="preserve"><value>Le nombre maximal de media est invalide</value></data>
+  <data name="MediaMaxCount.InvalidFormat.Description" xml:space="preserve"><value>Le nombre maximal d elements media doit etre superieur a zero.</value></data>
+  <data name="MediaMaxFileSize.InvalidFormat.Title" xml:space="preserve"><value>La taille maximale de fichier est invalide</value></data>
+  <data name="MediaMaxFileSize.InvalidFormat.Description" xml:space="preserve"><value>La taille maximale de fichier doit etre superieure a zero.</value></data>
+  <data name="ScanAttemptCount.InvalidFormat.Title" xml:space="preserve"><value>Le nombre de tentatives d analyse est invalide</value></data>
+  <data name="ScanAttemptCount.InvalidFormat.Description" xml:space="preserve"><value>Le nombre de tentatives d analyse ne peut pas etre negatif.</value></data>
+  <data name="AccessLevel.InvalidFormat.Title" xml:space="preserve"><value>Le niveau d acces est invalide</value></data>
+  <data name="AccessLevel.InvalidFormat.Description" xml:space="preserve"><value>Le niveau d acces doit etre public ou private.</value></data>
+  <data name="MediaStatus.InvalidFormat.Title" xml:space="preserve"><value>Le statut media est invalide</value></data>
+  <data name="MediaStatus.InvalidFormat.Description" xml:space="preserve"><value>Le statut media est invalide.</value></data>
+  <data name="MediaType.InvalidFormat.Title" xml:space="preserve"><value>Le type media est invalide</value></data>
+  <data name="MediaType.InvalidFormat.Description" xml:space="preserve"><value>Le type media est invalide.</value></data>
+  <data name="OwnerType.InvalidFormat.Title" xml:space="preserve"><value>Le type de proprietaire est invalide</value></data>
+  <data name="OwnerType.InvalidFormat.Description" xml:space="preserve"><value>Le type de proprietaire doit etre user, listing, identification ou verificationSubmission.</value></data>
+  <data name="VariantType.InvalidFormat.Title" xml:space="preserve"><value>Le type de variante est invalide</value></data>
+  <data name="VariantType.InvalidFormat.Description" xml:space="preserve"><value>Le type de variante doit etre original, thumbnail, medium ou large.</value></data>
+  <data name="ScanRejectionReason.InvalidFormat.Title" xml:space="preserve"><value>Le motif de rejet est invalide</value></data>
+  <data name="ScanRejectionReason.InvalidFormat.Description" xml:space="preserve"><value>Le motif de rejet doit etre infected ou scanFailed.</value></data>
+</root>

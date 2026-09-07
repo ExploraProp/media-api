@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <data name="MediaFile.Status.Pending.Required.Title" xml:space="preserve"><value>File is not pending</value></data>
+  <data name="MediaFile.Status.Pending.Required.Description" xml:space="preserve"><value>Scan can only be started when the file is pending.</value></data>
+  <data name="MediaFile.Status.Scanning.Required.Title" xml:space="preserve"><value>File is not being scanned</value></data>
+  <data name="MediaFile.Status.Scanning.Required.Description" xml:space="preserve"><value>This operation requires the file to be in Scanning status.</value></data>
+  <data name="MediaFile.Status.Approved.Required.Title" xml:space="preserve"><value>File is not approved</value></data>
+  <data name="MediaFile.Status.Approved.Required.Description" xml:space="preserve"><value>The requested media file has not been approved yet.</value></data>
+  <data name="MediaFile.Status.Scanning.Title" xml:space="preserve"><value>File is being scanned</value></data>
+  <data name="MediaFile.Status.Scanning.Description" xml:space="preserve"><value>Wait for the scan to complete before deleting this file.</value></data>
+  <data name="MediaFile.AccessLevel.Public.Title" xml:space="preserve"><value>File is public</value></data>
+  <data name="MediaFile.AccessLevel.Public.Description" xml:space="preserve"><value>This media file is public; use the public URL to access it.</value></data>
+  <data name="MediaFile.AccessLevel.Private.Title" xml:space="preserve"><value>File is private</value></data>
+  <data name="MediaFile.AccessLevel.Private.Description" xml:space="preserve"><value>This media file is private; use a signed URL to access it.</value></data>
+  <data name="MediaAccess.Owner.Invalid.Title" xml:space="preserve"><value>Permission denied</value></data>
+  <data name="MediaAccess.Owner.Invalid.Description" xml:space="preserve"><value>The user is not allowed to access or modify this media file.</value></data>
+  <data name="MediaPolicy.MaxFileSizeBytes.TooLarge.Title" xml:space="preserve"><value>File is too large</value></data>
+  <data name="MediaPolicy.MaxFileSizeBytes.TooLarge.Description" xml:space="preserve"><value>The uploaded file exceeds the maximum allowed size.</value></data>
+  <data name="MediaPolicy.MaxMediaCount.TooMany.Title" xml:space="preserve"><value>Too many media files</value></data>
+  <data name="MediaPolicy.MaxMediaCount.TooMany.Description" xml:space="preserve"><value>The owner has reached the maximum number of media items.</value></data>
+  <data name="MediaPolicy.AllowedContentTypes.Invalid.Title" xml:space="preserve"><value>File type is not allowed</value></data>
+  <data name="MediaPolicy.AllowedContentTypes.Invalid.Description" xml:space="preserve"><value>The uploaded file type is not allowed for this owner.</value></data>
+  <data name="ImageProcessingService.Response.Invalid.Title" xml:space="preserve"><value>Image could not be processed</value></data>
+  <data name="ImageProcessingService.Response.Invalid.Description" xml:space="preserve"><value>The uploaded file could not be processed.</value></data>
+  <data name="MarketingService.Response.Invalid.Title" xml:space="preserve"><value>Marketing service unavailable</value></data>
+  <data name="MarketingService.Response.Invalid.Description" xml:space="preserve"><value>The Marketing service is unavailable or rejected the internal request.</value></data>
+  <data name="Link.Empty.Title" xml:space="preserve"><value>Link is required</value></data>
+  <data name="Link.Empty.Description" xml:space="preserve"><value>Value is required.</value></data>
+  <data name="Link.InvalidFormat.Title" xml:space="preserve"><value>Link is invalid</value></data>
+  <data name="Link.InvalidFormat.Description" xml:space="preserve"><value>Must be a valid HTTP or HTTPS URL.</value></data>
+  <data name="StoragePath.Empty.Title" xml:space="preserve"><value>Storage path is required</value></data>
+  <data name="StoragePath.Empty.Description" xml:space="preserve"><value>Value is required.</value></data>
+  <data name="StoragePath.TooLong.Title" xml:space="preserve"><value>Storage path is too long</value></data>
+  <data name="StoragePath.TooLong.Description" xml:space="preserve"><value>Value must be at most {0} characters long.</value></data>
+  <data name="StoragePath.InvalidFormat.Title" xml:space="preserve"><value>Storage path is invalid</value></data>
+  <data name="StoragePath.InvalidFormat.Description" xml:space="preserve"><value>Storage path is invalid.</value></data>
+  <data name="MediaFileSize.InvalidFormat.Title" xml:space="preserve"><value>File size is invalid</value></data>
+  <data name="MediaFileSize.InvalidFormat.Description" xml:space="preserve"><value>File size must be greater than zero.</value></data>
+  <data name="MediaMaxCount.InvalidFormat.Title" xml:space="preserve"><value>Max media count is invalid</value></data>
+  <data name="MediaMaxCount.InvalidFormat.Description" xml:space="preserve"><value>Max media count must be greater than zero.</value></data>
+  <data name="MediaMaxFileSize.InvalidFormat.Title" xml:space="preserve"><value>Max file size is invalid</value></data>
+  <data name="MediaMaxFileSize.InvalidFormat.Description" xml:space="preserve"><value>Max file size must be greater than zero.</value></data>
+  <data name="ScanAttemptCount.InvalidFormat.Title" xml:space="preserve"><value>Scan attempt count is invalid</value></data>
+  <data name="ScanAttemptCount.InvalidFormat.Description" xml:space="preserve"><value>Scan attempt count cannot be negative.</value></data>
+  <data name="AccessLevel.InvalidFormat.Title" xml:space="preserve"><value>Access level is invalid</value></data>
+  <data name="AccessLevel.InvalidFormat.Description" xml:space="preserve"><value>Access level must be public or private.</value></data>
+  <data name="MediaStatus.InvalidFormat.Title" xml:space="preserve"><value>Media status is invalid</value></data>
+  <data name="MediaStatus.InvalidFormat.Description" xml:space="preserve"><value>Media status is invalid.</value></data>
+  <data name="MediaType.InvalidFormat.Title" xml:space="preserve"><value>Media type is invalid</value></data>
+  <data name="MediaType.InvalidFormat.Description" xml:space="preserve"><value>Media type is invalid.</value></data>
+  <data name="OwnerType.InvalidFormat.Title" xml:space="preserve"><value>Owner type is invalid</value></data>
+  <data name="OwnerType.InvalidFormat.Description" xml:space="preserve"><value>Owner type must be user, listing, identification, or verificationSubmission.</value></data>
+  <data name="VariantType.InvalidFormat.Title" xml:space="preserve"><value>Variant type is invalid</value></data>
+  <data name="VariantType.InvalidFormat.Description" xml:space="preserve"><value>Variant type must be original, thumbnail, medium, or large.</value></data>
+  <data name="ScanRejectionReason.InvalidFormat.Title" xml:space="preserve"><value>Scan rejection reason is invalid</value></data>
+  <data name="ScanRejectionReason.InvalidFormat.Description" xml:space="preserve"><value>Scan rejection reason must be infected or scanFailed.</value></data>
+</root>

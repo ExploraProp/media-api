@@ -1,0 +1,133 @@
+# Independently deployable service package.
+# Solo (from this directory):
+#   cp .env.example .env   # fill secrets
+#   docker compose up --build
+services:
+  media.api:
+    build:
+      context: ../..
+      dockerfile: src/API/Dockerfile
+      secrets:
+        - nuget_auth_token
+    container_name: media-api
+    ports:
+      - "7005:80"
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+      - APPLY_MIGRATIONS=true
+      - ConnectionStrings__Media=Server=db,1433;Database=Media;User ID=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;
+      - ConnectionStrings__DefaultConnection=Server=db,1433;Database=Media;User ID=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;
+      - MarketingService__BaseUrl=${MarketingService__BaseUrl:-http://marketing.api}
+      - FIREBASE_STORAGE_BUCKET=${FIREBASE_STORAGE_BUCKET}
+      - FIREBASE_SERVICE_ACCOUNT_JSON=/run/secrets/firebase_service_account.json
+      - MEDIA_WATERMARK_PATH=/app/Assets/watermark.png
+      - SCAN_SERVICE_HOST=clamav
+      - SCAN_SERVICE_PORT=3310
+      - IntegrationEvents__UseRabbitMq=true
+      - IntegrationEvents__RabbitMq__Host=rabbitmq
+      - IntegrationEvents__RabbitMq__Port=5672
+      - IntegrationEvents__RabbitMq__UserName=guest
+      - IntegrationEvents__RabbitMq__Password=guest
+      - IntegrationEvents__RabbitMq__VirtualHost=/
+      - IntegrationEvents__RabbitMq__Exchange=integration
+    volumes:
+      - ${FIREBASE_SERVICE_ACCOUNT_JSON}:/run/secrets/firebase_service_account.json:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      clamav:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health/ready"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2025-latest
+    container_name: db
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${SA_PASSWORD}
+      - MSSQL_SA_PASSWORD=${SA_PASSWORD}
+      - MSSQL_PID=Developer
+      - MSSQL_MEMORY_LIMIT_MB=3072
+      - MSSQL_LCID=1033
+      - MSSQL_ENABLE_HADR=0
+    ports:
+      - "1433:1433"
+    volumes:
+      - db-data:/var/opt/mssql
+    healthcheck:
+      test: bash -c "if [ ! -f /var/opt/mssql/log/errorlog ]; then exit 1; fi && grep -q 'SQL Server is now ready for client connections' /var/opt/mssql/log/errorlog"
+      interval: 15s
+      timeout: 3s
+      retries: 10
+      start_period: 120s
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: '2'
+
+  clamav:
+    image: clamav/clamav:latest
+    container_name: clamav
+    restart: unless-stopped
+    ports:
+      - "3310:3310"
+    volumes:
+      - clamav-data:/var/lib/clamav
+    healthcheck:
+      test: ["CMD", "clamdscan", "--ping", "1"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 300s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1'
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    hostname: rabbitmq
+    user: rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+      - RABBITMQ_ERLANG_COOKIE=InmoDevCookie
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 15s
+      retries: 15
+      start_period: 300s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+
+secrets:
+  nuget_auth_token:
+    environment: NUGET_AUTH_TOKEN
+
+volumes:
+  db-data:
+  clamav-data:

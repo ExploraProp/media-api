@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <SonarQubeTestProject>false</SonarQubeTestProject>
+    <StartupObject>Media.API.Program</StartupObject>
+    <UserSecretsId>e5a1b2c3-d4e5-4f6a-8b9c-0d1e2f3a4b5c</UserSecretsId>
+    <NoWarn>$(NoWarn);ARCH017;ARCH018;ARCH021;ARCH022</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="13.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="10.0.0" />
+    <PackageReference Include="Asp.Versioning.Mvc" Version="8.1.1" />
+    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Media.csproj" />
+    <PackageReference Include="SharedKernel" Version="2.0.14" />
+    <PackageReference Include="IntegrationEvents" Version="1.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\watermark.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>
