@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  DOTNET_VERSION: '10.0.103'
+  DOTNET_VERSION: '10.0.112'
   SOLUTION: 'Media.slnx'
   REGISTRY: ghcr.io
   IMAGE_OWNER: exploraprop

@@ -19,7 +19,7 @@ permissions:
   security-events: write
 
 env:
-  DOTNET_VERSION: '10.0.103'
+  DOTNET_VERSION: '10.0.112'
   SOLUTION: 'Media.slnx'
 
 jobs:

@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 env:
-  DOTNET_VERSION: '10.0.103'
+  DOTNET_VERSION: '10.0.112'
 
 jobs:
   configure:
