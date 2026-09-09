@@ -17,6 +17,38 @@
           "Microsoft.EntityFrameworkCore": "10.0.0"
         }
       },
+      "Microsoft.Kiota.Abstractions": {
+        "type": "Direct",
+        "requested": "[2.1.1, )",
+        "resolved": "2.1.1",
+        "contentHash": "baV/JJXkuMFZsEpLJUmE1mJUQ38AMG6bTob7lnZMNezwp51HSrIDIWDcHb80pMHOaHg+j5YEh5BSD4LHlXzphw==",
+        "dependencies": {
+          "Std.UriTemplate": "2.0.12"
+        }
+      },
+      "Microsoft.Kiota.Bundle": {
+        "type": "Direct",
+        "requested": "[2.1.1, )",
+        "resolved": "2.1.1",
+        "contentHash": "S4/Qdg95izIVg1eNVJcHjERIjrWa3VlQP5Ihe2ObIh/7rbUFyg4czeEZTox/F9hTOCNIH3XgHgBqwVN77i128g==",
+        "dependencies": {
+          "Microsoft.Kiota.Abstractions": "2.1.1",
+          "Microsoft.Kiota.Http.HttpClientLibrary": "2.1.1",
+          "Microsoft.Kiota.Serialization.Form": "2.1.1",
+          "Microsoft.Kiota.Serialization.Json": "2.1.1",
+          "Microsoft.Kiota.Serialization.Multipart": "2.1.1",
+          "Microsoft.Kiota.Serialization.Text": "2.1.1"
+        }
+      },
+      "Microsoft.Kiota.Http.HttpClientLibrary": {
+        "type": "Direct",
+        "requested": "[2.1.1, )",
+        "resolved": "2.1.1",
+        "contentHash": "y/BgWE6DXVheIHFU56A+jyjhUgQQzvPRsBlzgsGh64kRqqT8YPjUF8L+huq0hJD9QqbMeJZ7vC0OdFFdepYGXQ==",
+        "dependencies": {
+          "Microsoft.Kiota.Abstractions": "2.1.1"
+        }
+      },
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",
         "requested": "[17.11.1, )",
@@ -389,65 +421,45 @@
           "Microsoft.IdentityModel.Logging": "8.14.0"
         }
       },
-      "Microsoft.Kiota.Abstractions": {
+      "Microsoft.IO.RecyclableMemoryStream": {
         "type": "Transitive",
-        "resolved": "1.20.1",
-        "contentHash": "bv1n2gnxA/O+1a26h3YB6bgcc3ZSLCjRumMh7sVkFmksLaVonhcrJpUrEtBlnnYPrnHwzm/1BYQnYjCVG7A+fA==",
-        "dependencies": {
-          "Std.UriTemplate": "2.0.5"
-        }
-      },
-      "Microsoft.Kiota.Bundle": {
-        "type": "Transitive",
-        "resolved": "1.20.1",
-        "contentHash": "UlEyxmJYSqiG+A5RIMHEfRbNAkoEYZuFtwRbYkewtooFZcONlZ6KGNBxBh0Wx3ayFrqKaPKDE/ZV5Ow8TCP+zw==",
-        "dependencies": {
-          "Microsoft.Kiota.Abstractions": "1.20.1",
-          "Microsoft.Kiota.Http.HttpClientLibrary": "1.20.1",
-          "Microsoft.Kiota.Serialization.Form": "1.20.1",
-          "Microsoft.Kiota.Serialization.Json": "1.20.1",
-          "Microsoft.Kiota.Serialization.Multipart": "1.20.1",
-          "Microsoft.Kiota.Serialization.Text": "1.20.1"
-        }
-      },
-      "Microsoft.Kiota.Http.HttpClientLibrary": {
-        "type": "Transitive",
-        "resolved": "1.20.1",
-        "contentHash": "pQzs+9n3QAG/FKFwgIaRE0EqOXfW3rWliOdk9XZbghyRdeAtiQjSbJbpascdZlf7uatLpPYA145q6MYpLxvsgA==",
-        "dependencies": {
-          "Microsoft.Kiota.Abstractions": "1.20.1"
-        }
+        "resolved": "3.0.1",
+        "contentHash": "s/s20YTVY9r9TPfTrN5g8zPF1YhwxyqO6PxUkrYTGI2B+OGPe9AdajWZrLhFqXIvqIW23fnUE4+ztrUWNU1+9g=="
       },
       "Microsoft.Kiota.Serialization.Form": {
         "type": "Transitive",
-        "resolved": "1.20.1",
-        "contentHash": "n7izb8GZSoatmFSpMaHmh78U3oW+YdYb2gDwhkG86COHuiGWV9s0BKBeUlFakAV00CDwaH9iFqxCQ0veYVkG1A==",
+        "resolved": "2.1.1",
+        "contentHash": "74eI5Zdp9QTzNdCTTk6+GyqmbKvVTpQQOJ9jbRtrCjBPs2RT+u+zOhiEiaJFNl6xYditSR3DSNxR9bUcgnEt1g==",
         "dependencies": {
-          "Microsoft.Kiota.Abstractions": "1.20.1"
+          "Microsoft.IO.RecyclableMemoryStream": "3.0.1",
+          "Microsoft.Kiota.Abstractions": "2.1.1"
         }
       },
       "Microsoft.Kiota.Serialization.Json": {
         "type": "Transitive",
-        "resolved": "1.20.1",
-        "contentHash": "4MumZe45DI/o1YP+hq7wyArOHDhjkSiu14ysN4xWKe6vwlu43BUYydA/yT0CtjoPwbFW/6jfx/NVSvM3DzBzbg==",
+        "resolved": "2.1.1",
+        "contentHash": "OP1faSt0D8zFfuIREwWp+LBGPTF931LCU0c0dYJ7ak/AJ3VeaxqMRHsjxeiF5COUDI998ho9Bx9DZTXWSmm1gg==",
         "dependencies": {
-          "Microsoft.Kiota.Abstractions": "1.20.1"
+          "Microsoft.IO.RecyclableMemoryStream": "3.0.1",
+          "Microsoft.Kiota.Abstractions": "2.1.1"
         }
       },
       "Microsoft.Kiota.Serialization.Multipart": {
         "type": "Transitive",
-        "resolved": "1.20.1",
-        "contentHash": "tP7ZxA1zsIi3FE8CHwfA5JnzlW1NYld+LpFihFq+S7IXFDv1x37I968lPKGIdEpWW9vWacuqDQVKIyJiKZ257A==",
+        "resolved": "2.1.1",
+        "contentHash": "g+YuE+xKQbKK/ToKVTU7C1rkmscU8IsxMAVVNRU73+T/7qPbkye4ova9cBblnrvk/l+7CGZD+Chec9uJHFYttA==",
         "dependencies": {
-          "Microsoft.Kiota.Abstractions": "1.20.1"
+          "Microsoft.IO.RecyclableMemoryStream": "3.0.1",
+          "Microsoft.Kiota.Abstractions": "2.1.1"
         }
       },
       "Microsoft.Kiota.Serialization.Text": {
         "type": "Transitive",
-        "resolved": "1.20.1",
-        "contentHash": "Cue4l9AeU0WgL2CdUW8K58BMwQOyiHgT7aCov2qGEKpmpeWQj7cmAWCgxDfPHYPkZtz1Ccbrw4/6KrDgCmrC3Q==",
+        "resolved": "2.1.1",
+        "contentHash": "sI2bAMKHLFGAUe4QGqPc8HFr4UYSbJCwpYMcx3mDUuevF4s6sAYRvIyoTYkKvSTCxUqt02B1USsJZWBmvo37KA==",
         "dependencies": {
-          "Microsoft.Kiota.Abstractions": "1.20.1"
+          "Microsoft.IO.RecyclableMemoryStream": "3.0.1",
+          "Microsoft.Kiota.Abstractions": "2.1.1"
         }
       },
       "Microsoft.SqlServer.Server": {
@@ -643,8 +655,8 @@
       },
       "Std.UriTemplate": {
         "type": "Transitive",
-        "resolved": "2.0.5",
-        "contentHash": "PtqPdWNBObRcDHjyjbgOz2XoCJQaiA+HNDPQve/O7yGCkospfHDCuH9ULVx1msImwHHG+uhpDjiZX7bpLN/cnw=="
+        "resolved": "2.0.12",
+        "contentHash": "b/w8GfmVjf5c+8sTtGRVuwj6uC5KoPIn8+795xKlnGBBtph4FIVvgJVnh+x9dbDOkrst7XivIDJgyZSDFNsOYA=="
       },
       "System.ClientModel": {
         "type": "Transitive",
@@ -705,6 +717,9 @@
           "ExploraProp.Marketing.Internal.ApiClient": "[0.0.0-openapi.*, )",
           "MediatR": "[13.1.0, )",
           "Microsoft.EntityFrameworkCore.SqlServer": "[10.0.0, )",
+          "Microsoft.Kiota.Abstractions": "[2.1.1, )",
+          "Microsoft.Kiota.Bundle": "[2.1.1, )",
+          "Microsoft.Kiota.Http.HttpClientLibrary": "[2.1.1, )",
           "Microsoft.OpenApi": "[2.7.5, )",
           "SharedKernel": "[2.0.14, )",
           "SixLabors.ImageSharp": "[3.1.12, )"

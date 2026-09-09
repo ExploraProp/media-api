@@ -15,6 +15,11 @@
     <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="10.0.9" />
     <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.10" />
     <PackageReference Include="Microsoft.OpenApi" Version="2.7.5" />
+    <!-- Kiota 1.20.1 arrives via the ExploraProp.*.Internal.ApiClient packages; the whole
+         family is pinned together so serializers cannot straddle the 1.x/2.x boundary. -->
+    <PackageReference Include="Microsoft.Kiota.Abstractions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Kiota.Http.HttpClientLibrary" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Kiota.Bundle" Version="2.1.1" />
   </ItemGroup>
 
   <PropertyGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props')">
