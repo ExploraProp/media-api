@@ -58,7 +58,7 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <SonarQubeTestProject>true</SonarQubeTestProject>
-    <UserSecretsId>inmo-functional-tests</UserSecretsId>
+    <UserSecretsId>functional-tests</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props') And $(MSBuildProjectName.EndsWith('.Functional'))">

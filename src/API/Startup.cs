@@ -4,7 +4,6 @@ using Media.Application.Commands;
 using Media.Application.Localization;
 using Media.Infrastructure.Context;
 using Media.Infrastructure.Extensions;
-using Media.Infrastructure.Services;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using SharedKernel.Application.Services;
@@ -89,7 +88,7 @@ public class Startup(IConfiguration configuration)
             options.GroupNameFormat = "'v'VVV";
             options.SubstituteApiVersionInUrl = true;
         });
-        services.AddInmoApiDocumentation("Inmo Media API");
+        services.AddApiDocumentation("Media API");
         services.AddProblemDetails();
         services.AddErrorLocalization(typeof(MediaError), typeof(MediaCatalogLabels), typeof(ErrorResources));
     }
@@ -104,7 +103,7 @@ public class Startup(IConfiguration configuration)
         app.UseRouting();
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapInmoApiDocumentation(env);
+            endpoints.MapApiDocumentation(env);
             endpoints.MapControllers();
             endpoints.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false });
             endpoints.MapHealthChecks("/health/ready", new HealthCheckOptions

@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Inmo.Media.API": {
+    "Media.API": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
