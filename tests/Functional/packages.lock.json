@@ -1094,8 +1094,8 @@
       },
       "SharedKernel": {
         "type": "Transitive",
-        "resolved": "2.0.17",
-        "contentHash": "MVl98IhJKxVfxRQkfsmFeGGTN4XSQdFLAlDxLZBStn19bH0FEFDsxUy1JII0Fh4RXm5no2GE5VoyfwRq1vYxkA==",
+        "resolved": "2.0.25",
+        "contentHash": "laTam1GrMFHz66xLtWnQUIwlIk2Tbx3VyXcGhiARKmeM8VR+NOWjt5tDAk3xrMHWVb4GeBlKL+L9x8iJs4QRZQ==",
         "dependencies": {
           "FluentEmail.Smtp": "3.0.2",
           "Google.Apis.Auth": "1.70.0",
@@ -1244,17 +1244,6 @@
           "Testcontainers": "4.2.0"
         }
       },
-      "exploraprop.media.apiclient": {
-        "type": "Project",
-        "dependencies": {
-          "Microsoft.AspNetCore.DataProtection": "[10.0.9, )",
-          "Microsoft.Kiota.Abstractions": "[2.1.1, )",
-          "Microsoft.Kiota.Bundle": "[2.1.1, )",
-          "Microsoft.Kiota.Http.HttpClientLibrary": "[2.1.1, )",
-          "Microsoft.OpenApi": "[2.7.5, )",
-          "System.Security.Cryptography.Xml": "[10.0.10, )"
-        }
-      },
       "media": {
         "type": "Project",
         "dependencies": {
@@ -1265,7 +1254,7 @@
           "Microsoft.Kiota.Bundle": "[2.1.1, )",
           "Microsoft.Kiota.Http.HttpClientLibrary": "[2.1.1, )",
           "Microsoft.OpenApi": "[2.7.5, )",
-          "SharedKernel": "[2.0.14, )",
+          "SharedKernel": "[2.0.25, )",
           "SixLabors.ImageSharp": "[3.1.12, )"
         }
       },
@@ -1283,7 +1272,7 @@
           "Microsoft.Kiota.Bundle": "[2.1.1, )",
           "Microsoft.Kiota.Http.HttpClientLibrary": "[2.1.1, )",
           "Microsoft.OpenApi": "[2.7.5, )",
-          "SharedKernel": "[2.0.14, )",
+          "SharedKernel": "[2.0.25, )",
           "System.IdentityModel.Tokens.Jwt": "[8.0.1, )"
         }
       }

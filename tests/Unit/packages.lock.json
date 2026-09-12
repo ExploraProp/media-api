@@ -620,8 +620,8 @@
       },
       "SharedKernel": {
         "type": "Transitive",
-        "resolved": "2.0.14",
-        "contentHash": "sdpWgxxVgyH8/+tagc+J3TxGThfu9YpBANvtExDYWCif8O86hwEJlQPKk7sFEs/tHYMuG0d8lm5Ik7MHCPqkiQ==",
+        "resolved": "2.0.25",
+        "contentHash": "laTam1GrMFHz66xLtWnQUIwlIk2Tbx3VyXcGhiARKmeM8VR+NOWjt5tDAk3xrMHWVb4GeBlKL+L9x8iJs4QRZQ==",
         "dependencies": {
           "FluentEmail.Smtp": "3.0.2",
           "Google.Apis.Auth": "1.70.0",
@@ -721,7 +721,7 @@
           "Microsoft.Kiota.Bundle": "[2.1.1, )",
           "Microsoft.Kiota.Http.HttpClientLibrary": "[2.1.1, )",
           "Microsoft.OpenApi": "[2.7.5, )",
-          "SharedKernel": "[2.0.14, )",
+          "SharedKernel": "[2.0.25, )",
           "SixLabors.ImageSharp": "[3.1.12, )"
         }
       }
