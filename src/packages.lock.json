@@ -84,9 +84,9 @@
       },
       "SharedKernel": {
         "type": "Direct",
-        "requested": "[2.0.14, )",
-        "resolved": "2.0.14",
-        "contentHash": "sdpWgxxVgyH8/+tagc+J3TxGThfu9YpBANvtExDYWCif8O86hwEJlQPKk7sFEs/tHYMuG0d8lm5Ik7MHCPqkiQ==",
+        "requested": "[2.0.25, )",
+        "resolved": "2.0.25",
+        "contentHash": "laTam1GrMFHz66xLtWnQUIwlIk2Tbx3VyXcGhiARKmeM8VR+NOWjt5tDAk3xrMHWVb4GeBlKL+L9x8iJs4QRZQ==",
         "dependencies": {
           "FluentEmail.Smtp": "3.0.2",
           "Google.Apis.Auth": "1.70.0",
