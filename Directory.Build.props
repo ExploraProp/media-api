@@ -12,9 +12,9 @@
 
   <!-- Security pins only when standalone (monorepo bridge pulls root Directory.Build.props). -->
   <ItemGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props')">
-    <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="10.0.9" />
-    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.10" />
-    <PackageReference Include="Microsoft.OpenApi" Version="2.7.5" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="10.0.12" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.12" />
+    <PackageReference Include="Microsoft.OpenApi" Version="2.12.2" />
     <!-- Kiota 1.20.1 arrives via the ExploraProp.*.Internal.ApiClient packages; the whole
          family is pinned together so serializers cannot straddle the 1.x/2.x boundary. -->
     <PackageReference Include="Microsoft.Kiota.Abstractions" Version="2.1.1" />
@@ -34,7 +34,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props') And $(MSBuildProjectName.EndsWith('.Unit'))">
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.12" />
     <PackageReference Include="Moq" Version="4.20.72" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
@@ -71,7 +71,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props') And $(MSBuildProjectName.EndsWith('.API'))">
-    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.0">
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.12">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
