@@ -19,3 +19,6 @@ firebase_service_account.json
 **/firebase_service_account.json
 artifacts/
 
+
+# Local commit helper (do not commit)
+git_commits.ps1
