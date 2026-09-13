@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
 
 permissions:
@@ -29,6 +29,7 @@ env:
 jobs:
   unit:
     name: 🧪 Unit
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
       - name: ⬇️ Checkout
@@ -74,6 +75,7 @@ jobs:
 
   functional:
     name: 🧪 Functional
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
       - name: ⬇️ Checkout
