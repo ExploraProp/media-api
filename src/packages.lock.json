@@ -10,12 +10,11 @@
       },
       "ExploraProp.Marketing.Internal.ApiClient": {
         "type": "Direct",
-        "requested": "[0.0.0-openapi.*, )",
-        "resolved": "0.0.0-openapi.local",
-        "contentHash": "oTb87n3M9mwNw6TiS24HSeH9UGKLCyhNS0IFggI5XOZjJPak+tFryRFdNoVkwf7z+nmdjCEXRPL02tCZvSB8Qg==",
+        "requested": "[2026.*, )",
+        "resolved": "2026.9.16.1121",
+        "contentHash": "CsqY/xKub7hCVze2IJ+DCRsOQKz/389+EHgbJHkHu4ozfwtxzoRFCW04bI4bVblh3ZhEbWj0Xw0Zrd5aaBZ5jg==",
         "dependencies": {
-          "Microsoft.Kiota.Bundle": "1.20.1",
-          "Microsoft.OpenApi": "2.7.5"
+          "Microsoft.Kiota.Bundle": "2.1.1"
         }
       },
       "MediatR": {
@@ -84,9 +83,9 @@
       },
       "SharedKernel": {
         "type": "Direct",
-        "requested": "[2.0.25, )",
-        "resolved": "2.0.25",
-        "contentHash": "laTam1GrMFHz66xLtWnQUIwlIk2Tbx3VyXcGhiARKmeM8VR+NOWjt5tDAk3xrMHWVb4GeBlKL+L9x8iJs4QRZQ==",
+        "requested": "[2.0.27, )",
+        "resolved": "2.0.27",
+        "contentHash": "VqAm/TDbK5xaiDyHxVww/uy9GbWZaW20Zgjvz05LpOvy6PqAMaBvZfkEizxDDJhYRJLpYeiNdmhLaMWNyfYIrg==",
         "dependencies": {
           "FluentEmail.Smtp": "3.0.2",
           "Google.Apis.Auth": "1.70.0",
