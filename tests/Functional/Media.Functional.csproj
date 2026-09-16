@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <PackageReference Include="SharedKernel.Functional" Version="2.0.9" />
+    <PackageReference Include="SharedKernel.Functional" Version="2.0.20" />
     <PackageReference Include="SSH.NET" Version="2026.0.0" />
     <ProjectReference Include="..\..\src\API\Media.API.csproj" />
     <ProjectReference Include="..\..\clients\ExploraProp.Media.ApiClient\ExploraProp.Media.ApiClient.csproj" />

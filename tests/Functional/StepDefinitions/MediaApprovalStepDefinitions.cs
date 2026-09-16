@@ -22,6 +22,7 @@ namespace Media.Functional.StepDefinitions;
 public sealed class MediaApprovalStepDefinitions(
     ScenarioContext scenarioContext,
     ApiClient apiClient,
+    TestHttpHeaders headers,
     MediaApiClient mediaApi)
 {
     [Given(@"the scanner approved Carlos's uploaded photo")]
@@ -191,7 +192,7 @@ public sealed class MediaApprovalStepDefinitions(
         var tokenKey = $"AccessToken:{Personas.Sofia.Email}";
         if (scenarioContext.TryGetValue(tokenKey, out string? cached) && !string.IsNullOrEmpty(cached))
         {
-            apiClient.SetAuthToken(cached);
+            headers.SetAuthToken(cached);
             return;
         }
 
@@ -202,7 +203,7 @@ public sealed class MediaApprovalStepDefinitions(
             ? access.GetString() ?? ""
             : "";
         jwt.Should().NotBeNullOrEmpty();
-        apiClient.SetAuthToken(jwt);
+        headers.SetAuthToken(jwt);
         scenarioContext[tokenKey] = jwt;
     }
 }

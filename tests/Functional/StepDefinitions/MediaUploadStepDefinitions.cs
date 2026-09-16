@@ -28,10 +28,14 @@ namespace Media.Functional.StepDefinitions;
 public sealed class MediaUploadStepDefinitions(
     ScenarioContext scenarioContext,
     ApiClient apiClient,
+    TestHttpHeaders headers,
+    MediaSseClient mediaSse,
     MediaApiClient mediaApi)
 {
     private readonly ScenarioContext _scenarioContext = scenarioContext;
     private readonly ApiClient _apiClient = apiClient;
+    private readonly TestHttpHeaders _headers = headers;
+    private readonly MediaSseClient _mediaSse = mediaSse;
     private readonly MediaApiClient _mediaApi = mediaApi;
 
     internal const string LastMediaFileDtoKey = "LastMediaFileDto";
@@ -121,10 +125,10 @@ public sealed class MediaUploadStepDefinitions(
     [When(@"an anonymous visitor subscribes to scan events for the file")]
     public async Task WhenAnAnonymousVisitorSubscribesToScanEventsForTheFile()
     {
-        _apiClient.ClearAuthToken();
+        _headers.ClearAuthToken();
         var media = _scenarioContext.Get<MediaFileDto>(LastMediaFileDtoKey);
-        // SSE remains on shared ApiClient (Kiota stream has no ProblemDetails error map).
-        var result = await _apiClient.GetMediaEventsAsync(Guid.Parse(media.Id));
+        // SSE is hand-written (OpenAPI documents event-stream; Kiota does not generate a usable client).
+        var result = await _mediaSse.GetEventsAsync(Guid.Parse(media.Id));
         _scenarioContext.StashLastResponse(result);
     }
 
@@ -132,7 +136,7 @@ public sealed class MediaUploadStepDefinitions(
     public async Task WhenCarlosSubscribesToScanEventsForAFileThatDoesNotExist()
     {
         await EnsureCarlosSignedInAsync();
-        var result = await _apiClient.GetMediaEventsAsync(Guid.NewGuid());
+        var result = await _mediaSse.GetEventsAsync(Guid.NewGuid());
         _scenarioContext.StashLastResponse(result);
     }
 
@@ -140,7 +144,7 @@ public sealed class MediaUploadStepDefinitions(
     public async Task WhenCarlosSubscribesToScanEventsForAMalformedMediaId()
     {
         await EnsureCarlosSignedInAsync();
-        var result = await _apiClient.GetMediaEventsAsync("not-a-guid");
+        var result = await _mediaSse.GetEventsAsync("not-a-guid");
         _scenarioContext.StashLastResponse(result);
     }
 
@@ -149,7 +153,7 @@ public sealed class MediaUploadStepDefinitions(
     {
         await EnsureCarlosSignedInAsync();
         var media = _scenarioContext.Get<MediaFileDto>(LastMediaFileDtoKey);
-        var result = await _apiClient.GetMediaEventsAsync(Guid.Parse(media.Id));
+        var result = await _mediaSse.GetEventsAsync(Guid.Parse(media.Id));
         _scenarioContext.StashLastResponse(result);
         _scenarioContext["LastSseResponse"] = result.RawContent ?? "";
     }
@@ -168,7 +172,7 @@ public sealed class MediaUploadStepDefinitions(
     {
         await EnsureMariaSignedInAsync();
         var media = _scenarioContext.Get<MediaFileDto>(LastMediaFileDtoKey);
-        var result = await _apiClient.GetMediaEventsAsync(Guid.Parse(media.Id));
+        var result = await _mediaSse.GetEventsAsync(Guid.Parse(media.Id));
         _scenarioContext.StashLastResponse(result);
     }
 
@@ -293,7 +297,7 @@ public sealed class MediaUploadStepDefinitions(
         var tokenKey = $"AccessToken:{persona.Email}";
         if (_scenarioContext.TryGetValue(tokenKey, out string? cached) && !string.IsNullOrEmpty(cached))
         {
-            _apiClient.SetAuthToken(cached);
+            _headers.SetAuthToken(cached);
             return;
         }
 
@@ -304,7 +308,7 @@ public sealed class MediaUploadStepDefinitions(
             ? access.GetString() ?? ""
             : "";
         jwt.Should().NotBeNullOrEmpty();
-        _apiClient.SetAuthToken(jwt);
+        _headers.SetAuthToken(jwt);
         _scenarioContext[tokenKey] = jwt;
     }
 

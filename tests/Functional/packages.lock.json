@@ -116,9 +116,9 @@
       },
       "SharedKernel.Functional": {
         "type": "Direct",
-        "requested": "[2.0.9, )",
-        "resolved": "2.0.9",
-        "contentHash": "Ypp4y/lhYKVIwAHX2aystpU9pP27qbYZazbbq9S9oVeMo3WEmAj2ULBZdvS+AAXkk1HvGvckQST/B5bE66WTqw==",
+        "requested": "[2.0.20, )",
+        "resolved": "2.0.20",
+        "contentHash": "U5Kep6YBZDF5ld4I3Blo8EBhCmou7NoWRZSrfS61yO6m1HO9W410MC01MSrqCK6kbwf5QElC5ti1zrQ/E3z/JA==",
         "dependencies": {
           "ExploraProp.Engagement.Internal.ApiClient": "0.0.0-openapi.local",
           "FluentAssertions": "6.12.2",
@@ -130,7 +130,7 @@
           "Microsoft.Kiota.Http.HttpClientLibrary": "2.1.0",
           "Reqnroll": "2.2.0",
           "Reqnroll.MSTest": "2.2.0",
-          "SharedKernel": "2.0.17",
+          "SharedKernel": "2.0.27",
           "SixLabors.ImageSharp": "3.1.12",
           "Testcontainers": "4.2.0",
           "Testcontainers.MsSql": "4.2.0",
@@ -245,13 +245,10 @@
       },
       "ExploraProp.Marketing.Internal.ApiClient": {
         "type": "Transitive",
-        "resolved": "0.0.0-openapi.local",
-        "contentHash": "oTb87n3M9mwNw6TiS24HSeH9UGKLCyhNS0IFggI5XOZjJPak+tFryRFdNoVkwf7z+nmdjCEXRPL02tCZvSB8Qg==",
+        "resolved": "2026.9.16.1121",
+        "contentHash": "CsqY/xKub7hCVze2IJ+DCRsOQKz/389+EHgbJHkHu4ozfwtxzoRFCW04bI4bVblh3ZhEbWj0Xw0Zrd5aaBZ5jg==",
         "dependencies": {
-          "Microsoft.AspNetCore.DataProtection": "10.0.9",
-          "Microsoft.Kiota.Bundle": "1.20.1",
-          "Microsoft.OpenApi": "2.7.5",
-          "System.Security.Cryptography.Xml": "10.0.10"
+          "Microsoft.Kiota.Bundle": "2.1.1"
         }
       },
       "FluentEmail.Core": {
@@ -1105,8 +1102,8 @@
       },
       "SharedKernel": {
         "type": "Transitive",
-        "resolved": "2.0.25",
-        "contentHash": "laTam1GrMFHz66xLtWnQUIwlIk2Tbx3VyXcGhiARKmeM8VR+NOWjt5tDAk3xrMHWVb4GeBlKL+L9x8iJs4QRZQ==",
+        "resolved": "2.0.27",
+        "contentHash": "VqAm/TDbK5xaiDyHxVww/uy9GbWZaW20Zgjvz05LpOvy6PqAMaBvZfkEizxDDJhYRJLpYeiNdmhLaMWNyfYIrg==",
         "dependencies": {
           "FluentEmail.Smtp": "3.0.2",
           "Google.Apis.Auth": "1.70.0",
@@ -1269,14 +1266,14 @@
       "media": {
         "type": "Project",
         "dependencies": {
-          "ExploraProp.Marketing.Internal.ApiClient": "[0.0.0-openapi.*, )",
+          "ExploraProp.Marketing.Internal.ApiClient": "[2026.*, )",
           "MediatR": "[13.1.0, )",
           "Microsoft.EntityFrameworkCore.SqlServer": "[10.0.12, )",
           "Microsoft.Kiota.Abstractions": "[2.1.1, )",
           "Microsoft.Kiota.Bundle": "[2.1.1, )",
           "Microsoft.Kiota.Http.HttpClientLibrary": "[2.1.1, )",
           "Microsoft.OpenApi": "[2.12.2, )",
-          "SharedKernel": "[2.0.25, )",
+          "SharedKernel": "[2.0.27, )",
           "SixLabors.ImageSharp": "[3.1.12, )"
         }
       },
@@ -1294,7 +1291,7 @@
           "Microsoft.Kiota.Bundle": "[2.1.1, )",
           "Microsoft.Kiota.Http.HttpClientLibrary": "[2.1.1, )",
           "Microsoft.OpenApi": "[2.12.2, )",
-          "SharedKernel": "[2.0.25, )",
+          "SharedKernel": "[2.0.27, )",
           "System.IdentityModel.Tokens.Jwt": "[8.0.1, )"
         }
       }
