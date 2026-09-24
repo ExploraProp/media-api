@@ -116,11 +116,15 @@
       },
       "SharedKernel.Functional": {
         "type": "Direct",
-        "requested": "[2.0.20, )",
-        "resolved": "2.0.20",
-        "contentHash": "U5Kep6YBZDF5ld4I3Blo8EBhCmou7NoWRZSrfS61yO6m1HO9W410MC01MSrqCK6kbwf5QElC5ti1zrQ/E3z/JA==",
+        "requested": "[2.0.23, )",
+        "resolved": "2.0.23",
+        "contentHash": "O+Rtimb16pn9rwOU/FeqbtO5i8jFPUeh75ipH4ayuc1UZwWFg3LyjgHYYFTMVyjx2/uIBLnjj/zRdl+4PzaAzQ==",
         "dependencies": {
-          "ExploraProp.Engagement.Internal.ApiClient": "0.0.0-openapi.local",
+          "ExploraProp.Asset.ApiClient": "2026.9.13.241",
+          "ExploraProp.Customer.ApiClient": "2026.9.13.240",
+          "ExploraProp.Engagement.Internal.ApiClient": "2026.9.9.1422",
+          "ExploraProp.Marketing.ApiClient": "2026.9.13.240",
+          "ExploraProp.Session.ApiClient": "2026.9.13.217",
           "FluentAssertions": "6.12.2",
           "MSTest.TestFramework": "3.6.3",
           "Microsoft.AspNetCore.Mvc.Testing": "10.0.0",
@@ -130,7 +134,7 @@
           "Microsoft.Kiota.Http.HttpClientLibrary": "2.1.0",
           "Reqnroll": "2.2.0",
           "Reqnroll.MSTest": "2.2.0",
-          "SharedKernel": "2.0.27",
+          "SharedKernel": "2.0.23",
           "SixLabors.ImageSharp": "3.1.12",
           "Testcontainers": "4.2.0",
           "Testcontainers.MsSql": "4.2.0",
@@ -232,15 +236,36 @@
           "Docker.DotNet.Enhanced": "3.126.1"
         }
       },
+      "ExploraProp.Asset.ApiClient": {
+        "type": "Transitive",
+        "resolved": "2026.9.13.241",
+        "contentHash": "oOncgTLMSUbL2zM9GRWA/AZScm852ryymB1kqw90sSGFycJ88NpT1pqIfyM+CbQ5oO633OGrKr025j8aWw05BA==",
+        "dependencies": {
+          "Microsoft.Kiota.Bundle": "1.20.1"
+        }
+      },
+      "ExploraProp.Customer.ApiClient": {
+        "type": "Transitive",
+        "resolved": "2026.9.13.240",
+        "contentHash": "ky8KCQKH30x65Al78eILDWZvmJDctfjH+jCXnpNfaquFwh/jRsvYronPU506y2LspypT+h5Y0Nha9Zj4+097Nw==",
+        "dependencies": {
+          "Microsoft.Kiota.Bundle": "1.20.1"
+        }
+      },
       "ExploraProp.Engagement.Internal.ApiClient": {
         "type": "Transitive",
-        "resolved": "0.0.0-openapi.local",
-        "contentHash": "UF/pDT6EmAc+qe0uf5gfmuTZsnFMXqTvhKweXrMqkl89jOCD0DcZJ1EWFtS0vEKgUU4tovTRV7XnPBYML3/Y1g==",
+        "resolved": "2026.9.9.1422",
+        "contentHash": "Kj9DDRmz6d9kQzzxR3VEPJ88amJqXEW2IXubYZy78GXLk0DBJWwE5TBIwhyHpaY71WrbHwlRO055x1KqlS1Y+Q==",
         "dependencies": {
-          "Microsoft.AspNetCore.DataProtection": "10.0.9",
-          "Microsoft.Kiota.Bundle": "1.20.1",
-          "Microsoft.OpenApi": "2.7.5",
-          "System.Security.Cryptography.Xml": "10.0.10"
+          "Microsoft.Kiota.Bundle": "1.20.1"
+        }
+      },
+      "ExploraProp.Marketing.ApiClient": {
+        "type": "Transitive",
+        "resolved": "2026.9.13.240",
+        "contentHash": "dbl6fQe7VZJLUhI3ohV7WmMdkQ9aKibA6PBbMmU24Yyz4xHaRzkcG1b4j3Pp40pLkAqhd3+dojeLCq9Ir7gWpQ==",
+        "dependencies": {
+          "Microsoft.Kiota.Bundle": "1.20.1"
         }
       },
       "ExploraProp.Marketing.Internal.ApiClient": {
@@ -249,6 +274,14 @@
         "contentHash": "CsqY/xKub7hCVze2IJ+DCRsOQKz/389+EHgbJHkHu4ozfwtxzoRFCW04bI4bVblh3ZhEbWj0Xw0Zrd5aaBZ5jg==",
         "dependencies": {
           "Microsoft.Kiota.Bundle": "2.1.1"
+        }
+      },
+      "ExploraProp.Session.ApiClient": {
+        "type": "Transitive",
+        "resolved": "2026.9.13.217",
+        "contentHash": "mmy7abc/wM3XAIKc5w5pDy2vgGsNxuK3KlLmtVHgd0W13zd68JhkFcANfFwfgy/ZLsRqhyF0iaJwcMagSHXvKg==",
+        "dependencies": {
+          "Microsoft.Kiota.Bundle": "1.20.1"
         }
       },
       "FluentEmail.Core": {

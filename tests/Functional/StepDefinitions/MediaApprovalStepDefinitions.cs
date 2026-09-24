@@ -14,15 +14,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Reqnroll;
 using SharedKernel.Kernel.Results;
 using System.Net;
-using System.Text.Json;
 
 namespace Media.Functional.StepDefinitions;
 
 [Binding]
 public sealed class MediaApprovalStepDefinitions(
     ScenarioContext scenarioContext,
-    ApiClient apiClient,
-    TestHttpHeaders headers,
+    MeshAuthSetup meshAuth,
     MediaApiClient mediaApi)
 {
     [Given(@"the scanner approved Carlos's uploaded photo")]
@@ -187,23 +185,6 @@ public sealed class MediaApprovalStepDefinitions(
         scenarioContext.StashLastResponse(result);
     }
 
-    private async Task EnsureSofiaSignedInAsync()
-    {
-        var tokenKey = $"AccessToken:{Personas.Sofia.Email}";
-        if (scenarioContext.TryGetValue(tokenKey, out string? cached) && !string.IsNullOrEmpty(cached))
-        {
-            headers.SetAuthToken(cached);
-            return;
-        }
-
-        var login = await apiClient.LoginAsync(new { email = Personas.Sofia.Email, password = Personas.Sofia.Password });
-        login.IsSuccess.Should().BeTrue($"Sofía login failed: {login.Error?.Detail ?? login.RawContent}");
-        var jwt = login.Data.ValueKind == JsonValueKind.Object
-            && login.Data.TryGetProperty("accessToken", out var access)
-            ? access.GetString() ?? ""
-            : "";
-        jwt.Should().NotBeNullOrEmpty();
-        headers.SetAuthToken(jwt);
-        scenarioContext[tokenKey] = jwt;
-    }
+    private Task EnsureSofiaSignedInAsync() =>
+        meshAuth.EnsureSignedInAsync(scenarioContext, Personas.Sofia);
 }

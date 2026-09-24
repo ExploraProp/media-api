@@ -9,14 +9,13 @@ using Media.Domain.Entities.Errors;
 using Media.Domain.Enums.Properties;
 using Media.Domain.ValueObjects.Ids;
 using Media.Domain.ValueObjects.Properties;
+using Media.Functional.Infrastructure;
 using Media.Infrastructure.Context;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Kiota.Abstractions;
 using Reqnroll;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using System.Net;
-using System.Text.Json;
 using KiotaMediaFileDto = ExploraProp.Media.ApiClient.Models.MediaFileDto;
 using KiotaMediaVariantDto = ExploraProp.Media.ApiClient.Models.MediaVariantDto;
 using UploadedByClientId = Media.Domain.ValueObjects.Ids.UploadedByClientId;
@@ -27,13 +26,13 @@ namespace Media.Functional.StepDefinitions;
 [Binding]
 public sealed class MediaUploadStepDefinitions(
     ScenarioContext scenarioContext,
-    ApiClient apiClient,
+    MeshAuthSetup meshAuth,
     TestHttpHeaders headers,
     MediaSseClient mediaSse,
     MediaApiClient mediaApi)
 {
     private readonly ScenarioContext _scenarioContext = scenarioContext;
-    private readonly ApiClient _apiClient = apiClient;
+    private readonly MeshAuthSetup _meshAuth = meshAuth;
     private readonly TestHttpHeaders _headers = headers;
     private readonly MediaSseClient _mediaSse = mediaSse;
     private readonly MediaApiClient _mediaApi = mediaApi;
@@ -73,7 +72,7 @@ public sealed class MediaUploadStepDefinitions(
         await EnsureCarlosSignedInAsync();
         var result = await UploadPhotoAsync(CreateJpegStream(2 * 1024 * 1024), "photo.jpg", "image/jpeg");
         result.IsSuccess.Should().BeTrue(
-            $"seed upload failed: {result.Error?.Detail ?? result.RawContent}");
+            $"seed upload failed: {result.ErrorDetail ?? result.RawContent}");
         _scenarioContext[LastMediaFileDtoKey] = result.Data!;
     }
 
@@ -189,7 +188,7 @@ public sealed class MediaUploadStepDefinitions(
     {
         var snapshot = _scenarioContext.Get<LastApiResponse>("LastApiResponse");
         snapshot.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
-        snapshot.FieldErrors.Should().ContainSingle(f => f.Code == MediaPolicyError.TooLarge.Code.Value,
+        snapshot.FieldErrorCodes.Should().ContainSingle(f => f == MediaPolicyError.TooLarge.Code.Value,
             "the 422 must carry the FileTooLarge error in the errors extension");
     }
 
@@ -198,7 +197,7 @@ public sealed class MediaUploadStepDefinitions(
     {
         var snapshot = _scenarioContext.Get<LastApiResponse>("LastApiResponse");
         snapshot.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
-        snapshot.FieldErrors.Should().ContainSingle(f => f.Code == MediaPolicyError.UnsupportedContentType.Code.Value,
+        snapshot.FieldErrorCodes.Should().ContainSingle(f => f == MediaPolicyError.UnsupportedContentType.Code.Value,
             "the 422 must carry the UnsupportedContentType error in the errors extension");
     }
 
@@ -207,7 +206,7 @@ public sealed class MediaUploadStepDefinitions(
     {
         var snapshot = _scenarioContext.Get<LastApiResponse>("LastApiResponse");
         snapshot.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
-        snapshot.FieldErrors.Should().ContainSingle(f => f.Code == MediaPolicyError.TooMany.Code.Value,
+        snapshot.FieldErrorCodes.Should().ContainSingle(f => f == MediaPolicyError.TooMany.Code.Value,
             "the 422 must carry the TooMany error in the errors extension");
     }
 
@@ -232,14 +231,15 @@ public sealed class MediaUploadStepDefinitions(
         string fileName,
         string contentType)
     {
-        // Multipart validation errors: keep shared ApiClient so ProblemDetails field codes
-        // round-trip into FieldErrors (Kiota Media ProblemDetails lacks typed Errors).
-        return (await _apiClient.UploadMediaAsync(
+        var body = MediaKiotaHelpers.BuildUploadBody(
             stream,
             fileName,
             contentType,
             OwnerType.Listing.ToI18nCode(),
-            ListingId)).As<MediaFileDto>();
+            ListingId);
+        var result = await KiotaApiCall.TryAsync(() =>
+            _mediaApi.Api.V1.Media.Upload.PostAsync(body));
+        return MapMediaResponse(result);
     }
 
     private async Task<ApiResponse<MediaFileDto>> GetMediaAsync(string mediaFileId)
@@ -255,7 +255,9 @@ public sealed class MediaUploadStepDefinitions(
             StatusCode = result.StatusCode,
             IsSuccess = result.IsSuccess,
             Data = result.Data is null ? null : ToAppDto(result.Data),
-            Error = result.Error,
+            ErrorDetail = result.ErrorDetail,
+            ErrorCode = result.ErrorCode,
+            FieldErrorCodes = result.FieldErrorCodes,
             RawContent = result.RawContent,
         };
 
@@ -288,29 +290,11 @@ public sealed class MediaUploadStepDefinitions(
             null,
             0);
 
-    private Task EnsureCarlosSignedInAsync() => EnsurePersonaSignedInAsync(Personas.Carlos);
+    private Task EnsureCarlosSignedInAsync() =>
+        _meshAuth.EnsureSignedInAsync(_scenarioContext, Personas.Carlos);
 
-    private Task EnsureMariaSignedInAsync() => EnsurePersonaSignedInAsync(Personas.Maria);
-
-    private async Task EnsurePersonaSignedInAsync(Persona persona)
-    {
-        var tokenKey = $"AccessToken:{persona.Email}";
-        if (_scenarioContext.TryGetValue(tokenKey, out string? cached) && !string.IsNullOrEmpty(cached))
-        {
-            _headers.SetAuthToken(cached);
-            return;
-        }
-
-        var login = await _apiClient.LoginAsync(new { email = persona.Email, password = persona.Password });
-        login.IsSuccess.Should().BeTrue($"{persona.FirstName} login failed: {login.Error?.Detail ?? login.RawContent}");
-        var jwt = login.Data.ValueKind == JsonValueKind.Object
-            && login.Data.TryGetProperty("accessToken", out var access)
-            ? access.GetString() ?? ""
-            : "";
-        jwt.Should().NotBeNullOrEmpty();
-        _headers.SetAuthToken(jwt);
-        _scenarioContext[tokenKey] = jwt;
-    }
+    private Task EnsureMariaSignedInAsync() =>
+        _meshAuth.EnsureSignedInAsync(_scenarioContext, Personas.Maria);
 
     private static MemoryStream CreateJpegStream(int minSize) =>
         minSize > 8 * 1024 * 1024
