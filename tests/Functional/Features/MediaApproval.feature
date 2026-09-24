@@ -30,7 +30,7 @@ Scenario: Deleting a file that does not exist is not found
 Scenario: A publisher cannot delete another publisher's photo
     Given Carlos publishes an active listing "Terreno con vista en Valle de Bravo"
     And Carlos uploaded a photo to his listing
-    And Sofía is signed in as a different publisher member
+    And Sofía has a publisher
     When Sofía tries to delete Carlos's photo
     Then Sofía should not be allowed
 

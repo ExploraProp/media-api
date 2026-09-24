@@ -8,12 +8,10 @@ namespace Media.Functional.Infrastructure;
 [Binding]
 public sealed class MediaClientHooks(IObjectContainer objectContainer)
 {
-    private const string WorkerKey = "FunctionalWorker";
-
     [BeforeScenario(Order = 1)]
     public void RegisterMediaApiClient(FeatureContext featureContext)
     {
-        var worker = featureContext.Get<Worker>(WorkerKey);
+        var worker = featureContext.Get<Worker>();
         var mediaApi = KiotaHttpClientFactory.CreateClient(
             worker.HttpClient,
             adapter => new MediaApiClient(adapter));

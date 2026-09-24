@@ -256,7 +256,7 @@ this.ScenarioInitialize(scenarioInfo);
     await testRunner.AndAsync("Carlos uploaded a photo to his listing", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
 #line 33
-    await testRunner.AndAsync("Sofía is signed in as a different publisher member", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
+    await testRunner.AndAsync("Sofía has a publisher", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
 #line 34
     await testRunner.WhenAsync("Sofía tries to delete Carlos\'s photo", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
