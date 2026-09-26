@@ -22,3 +22,6 @@ artifacts/
 
 # Local commit helper (do not commit)
 git_commits.ps1
+
+# Reqnroll/SpecFlow generated code-behind
+*.feature.cs
