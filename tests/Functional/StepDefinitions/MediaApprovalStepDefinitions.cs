@@ -155,13 +155,21 @@ public sealed class MediaApprovalStepDefinitions(
         return await mediator.Send(new ApproveMediaCommand(idResult.Value!), CancellationToken.None);
     }
 
-    private static ApiResponse<MediaFileDto> ToApiResponse(Result<MediaFileDto> result) =>
-        new()
-        {
-            StatusCode = result.IsSuccess ? HttpStatusCode.OK : result.Error!.StatusCode,
-            IsSuccess = result.IsSuccess,
-            Data = result.Value,
-        };
+    private static ApiResponse<MediaFileDto> ToApiResponse(Result<MediaFileDto> result)
+    {
+        if (result.IsSuccess)
+            return ApiResponse<MediaFileDto>.Ok(result.Value);
+
+        var error = result.Error!;
+        return ApiResponse<MediaFileDto>.Fail(
+            error.StatusCode,
+            new ApiProblemDetails
+            {
+                Status = (int)error.StatusCode,
+                Code = error.Code.Value,
+                Detail = error.Code.Value,
+            });
+    }
 
     private async Task DeleteMediaAsync(string mediaFileId)
     {
@@ -172,15 +180,7 @@ public sealed class MediaApprovalStepDefinitions(
         });
         // KiotaApiCall hard-codes OK on success; the API returns 204 NoContent for deletes.
         if (result.IsSuccess)
-        {
-            result = new ApiResponse<object>
-            {
-                StatusCode = HttpStatusCode.NoContent,
-                IsSuccess = true,
-                Data = null,
-                RawContent = null,
-            };
-        }
+            result = ApiResponse<object>.Ok(null, HttpStatusCode.NoContent);
 
         scenarioContext.StashLastResponse(result);
     }

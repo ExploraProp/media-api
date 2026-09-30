@@ -253,11 +253,8 @@ public sealed class MediaUploadStepDefinitions(
         new()
         {
             StatusCode = result.StatusCode,
-            IsSuccess = result.IsSuccess,
             Data = result.Data is null ? null : ToAppDto(result.Data),
-            ErrorDetail = result.ErrorDetail,
-            ErrorCode = result.ErrorCode,
-            FieldErrorCodes = result.FieldErrorCodes,
+            Error = result.Error,
             RawContent = result.RawContent,
         };
 
