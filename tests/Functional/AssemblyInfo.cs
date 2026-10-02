@@ -1,5 +1,6 @@
-using Functional.Infrastructure;
+using Functional.Domain.Enums.Properties;
+using Functional.Api;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [assembly: Parallelize(Workers = 1, Scope = ExecutionScope.ClassLevel)]
-[assembly: FunctionalMeshProfile(FunctionalMeshProfile.Media)]
+[assembly: FunctionalMeshProfile(ApplicationProgrammingInterface.Media)]
