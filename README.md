@@ -9,6 +9,7 @@ Owns media files, variants, upload policies, and internal media URL reads for si
 | Public SDK | [csharp_media_sdk](https://github.com/ExploraProp/csharp_media_sdk) (`ExploraProp.Media.ApiClient`) |
 | Internal SDK | [csharp_media_internal_sdk](https://github.com/ExploraProp/csharp_media_internal_sdk) (`ExploraProp.Media.Internal.ApiClient`) |
 | Contracts | [openapi-contracts](https://github.com/ExploraProp/openapi-contracts) / [openapi-contracts-internal](https://github.com/ExploraProp/openapi-contracts-internal) |
+| Scalar | http://localhost:7005/scalar |
 | CI | In-tree `.github/workflows/` (secrets wired per BC) |
 
 ## Prerequisites
