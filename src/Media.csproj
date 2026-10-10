@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="SharedKernel" Version="2.0.27" />
+    <PackageReference Include="SharedKernel" Version="2.0.34" />
     <PackageReference Include="ExploraProp.Marketing.Internal.ApiClient" Version="2026.*" />
   </ItemGroup>
 
