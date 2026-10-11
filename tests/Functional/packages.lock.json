@@ -116,9 +116,9 @@
       },
       "SharedKernel.Functional": {
         "type": "Direct",
-        "requested": "[2.0.35, )",
-        "resolved": "2.0.35",
-        "contentHash": "mS7y+Xf4OhvyCPhhkHiX8sbcac1vzhRyJ7ogDIoD9cdEKwIKjWNjCIV0GV3yeSxUxL64QgD/6h7T5qBogNdTDQ==",
+        "requested": "[2.0.36, )",
+        "resolved": "2.0.36",
+        "contentHash": "bEHTC/Oqf+3FUpZeCsYAjWpW4NoTNpmb2t2Tp/ZwS9Xg4Q3IgkkXG2sYKjj64QyPXC2gKAT60GNDGzXM3/jlww==",
         "dependencies": {
           "FluentAssertions": "6.12.2",
           "MSTest.TestFramework": "3.6.3",
@@ -128,8 +128,7 @@
           "Reqnroll": "2.2.0",
           "Reqnroll.MSTest": "2.2.0",
           "SSH.NET": "2026.0.0",
-          "SharedKernel": "2.0.33",
-          "SixLabors.ImageSharp": "3.1.12",
+          "SharedKernel": "2.0.34",
           "StackExchange.Redis": "2.8.24",
           "Testcontainers": "4.2.0",
           "Testcontainers.MsSql": "4.2.0",
