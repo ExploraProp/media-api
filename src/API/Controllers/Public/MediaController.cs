@@ -6,12 +6,12 @@ using Media.Domain.ValueObjects.Ids;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Media.API.Controllers;
+namespace Media.API.Controllers.Public;
 
 /// <summary>
 /// Handles media file upload and scan-result notification.
 /// </summary>
-public class MediaController(IMediator mediator) : BaseApiController
+public class MediaController(IMediator mediator) : PublicApiController
 {
     [HttpPost("upload")]
     [ProducesResponseType(typeof(MediaFileDto), StatusCodes.Status201Created)]
