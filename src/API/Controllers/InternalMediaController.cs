@@ -9,14 +9,14 @@ namespace Media.API.Controllers;
 public sealed class InternalMediaController(MediaPublicUrlService mediaPublicUrlService) : ControllerBase
 {
     [HttpPost("public-urls")]
-    [ProducesResponseType(typeof(MeshPublicUrlsResponse), StatusCodes.Status200OK)]
-    public async Task<ActionResult<MeshPublicUrlsResponse>> GetPublicUrls(
-        [FromBody] MeshPublicUrlsRequest request,
+    [ProducesResponseType(typeof(PublicUrlsResponse), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PublicUrlsResponse>> GetPublicUrls(
+        [FromBody] PublicUrlsRequest request,
         CancellationToken cancellationToken)
     {
         var urls = await mediaPublicUrlService.GetPublicUrlsAsync(
             request.MediaFileIds,
             cancellationToken);
-        return Ok(new MeshPublicUrlsResponse(urls));
+        return Ok(new PublicUrlsResponse(urls));
     }
 }

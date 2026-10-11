@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Media.Infrastructure.Services;
 
 /// <summary>
-/// In-process large-variant public URL service for Media mesh ACL.
+/// In-process large-variant public URL service for Media internal ACL.
 /// </summary>
 public sealed class MediaPublicUrlService(MediaDbContext context)
 {
