@@ -1,3 +1,4 @@
+using Media.Application.Services.Interfaces;
 using Media.Domain.Entities.Definitions;
 using Media.Domain.Enums.Properties;
 using Media.Domain.ValueObjects.Ids;
@@ -9,7 +10,7 @@ namespace Media.Infrastructure.Services;
 /// <summary>
 /// In-process large-variant public URL service for Media internal ACL.
 /// </summary>
-public sealed class MediaPublicUrlService(MediaDbContext context)
+public sealed class MediaPublicUrlService(MediaDbContext context) : IMediaPublicUrlService
 {
     public async Task<IReadOnlyDictionary<Guid, string?>> GetPublicUrlsAsync(
         IReadOnlyList<Guid> mediaFileIds,

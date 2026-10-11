@@ -43,7 +43,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMediaScanOrchestrator, MediaScanOrchestrator>();
         services.AddScoped<IImageProcessingService, ImageProcessingService>();
         services.AddScoped<IMediaEventAccessService, MediaEventAccessService>();
-        services.AddScoped<MediaPublicUrlService>();
+        services.AddScoped<IMediaPublicUrlService, MediaPublicUrlService>();
         services.AddSingleton<IMediaEventChannel, MediaEventChannel>();
         services.AddSingleton<IMediaEventWaitService, MediaEventWaitService>();
         services.AddSingleton(_ => Channel.CreateUnbounded<MediaFileId>(new UnboundedChannelOptions { SingleReader = true }));
