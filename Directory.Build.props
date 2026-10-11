@@ -8,6 +8,9 @@
     <NullableReferenceTypesAnnotations>true</NullableReferenceTypesAnnotations>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <IsPackable>false</IsPackable>
+    <!-- ImageSharp 4.x build-time license (direct PackageReference only). -->
+    <SixLaborsLicenseFile Condition="'$(SixLaborsLicenseFile)' == '' and Exists('$(MSBuildThisFileDirectory)sixlabors.lic')">$(MSBuildThisFileDirectory)sixlabors.lic</SixLaborsLicenseFile>
+    <SixLaborsLicenseKey Condition="'$(SixLaborsLicenseKey)' == '' and '$(SIXLABORS_LICENSE_KEY)' != ''">$(SIXLABORS_LICENSE_KEY)</SixLaborsLicenseKey>
   </PropertyGroup>
 
   <!-- Security pins only when standalone (monorepo bridge pulls root Directory.Build.props). -->

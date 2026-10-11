@@ -6,6 +6,7 @@ name: 🔐 Configure API env
 # - `NUGET_AUTH_TOKEN`
 # - `FIREBASE_STORAGE_BUCKET`
 # - `FIREBASE_SERVICE_ACCOUNT_JSON`
+# - `SIXLABORS_LICENSE_KEY` (ImageSharp 4.x build)
 
 on:
   workflow_dispatch:
@@ -45,7 +46,12 @@ jobs:
           NUGET_AUTH_TOKEN: ${{ secrets.NUGET_AUTH_TOKEN }}
           FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          SIXLABORS_LICENSE_KEY: ${{ secrets.SIXLABORS_LICENSE_KEY }}
         run: |
           set -euo pipefail
+          if [ -z "${SIXLABORS_LICENSE_KEY:-}" ]; then
+            echo "::error::SIXLABORS_LICENSE_KEY secret is required for ImageSharp 4.x builds"
+            exit 1
+          fi
           dotnet tool run api-scripts -- secrets-ci --service Media --format github-env >> "$GITHUB_ENV"
           echo "secrets-ci OK for Media"

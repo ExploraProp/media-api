@@ -25,6 +25,7 @@ env:
   NUGET_AUTH_TOKEN: ${{ secrets.NUGET_AUTH_TOKEN }}
   FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
   FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+  SIXLABORS_LICENSE_KEY: ${{ secrets.SIXLABORS_LICENSE_KEY }}
 
 jobs:
   unit:
@@ -346,6 +347,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           secrets: |
             nuget_auth_token=${{ secrets.NUGET_AUTH_TOKEN }}
+            sixlabors_license_key=${{ secrets.SIXLABORS_LICENSE_KEY }}
           cache-from: type=gha,scope=${{ env.IMAGE_NAME }}
           cache-to: type=gha,mode=max,scope=${{ env.IMAGE_NAME }}
 

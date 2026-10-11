@@ -50,12 +50,13 @@ docs/                 ERROR_CATALOG.md, errors.html
 
 ```powershell
 Copy-Item src/API/.env.example src/API/.env
+# ImageSharp 4.x: set SIXLABORS_LICENSE_KEY to the full contents of sixlabors.lic, then:
+#   $env:SIXLABORS_LICENSE_KEY = '<paste license string>'
 dotnet tool run api-scripts -- secrets-local --service Media
 dotnet restore Media.slnx
 dotnet build Media.slnx -c Release
 dotnet test tests/Unit/Media.Unit.csproj -c Release
 ```
-
 Run from `src/API`:
 
 ```powershell

@@ -9,6 +9,7 @@ services:
       dockerfile: src/API/Dockerfile
       secrets:
         - nuget_auth_token
+        - sixlabors_license_key
     container_name: media-api
     ports:
       - "7005:80"
@@ -127,6 +128,8 @@ services:
 secrets:
   nuget_auth_token:
     environment: NUGET_AUTH_TOKEN
+  sixlabors_license_key:
+    environment: SIXLABORS_LICENSE_KEY
 
 volumes:
   db-data:
