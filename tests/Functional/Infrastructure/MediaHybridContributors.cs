@@ -1,3 +1,4 @@
+using ExploraProp.Marketing.Internal.ApiClient;
 using Functional.Application;
 using Functional.Application.Ports;
 using Functional.Domain.Enums.Properties;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using SharedKernel.Application.Services;
 using SharedKernel.Kernel.Outbox;
 
 namespace Media.Functional.Infrastructure;
@@ -37,6 +39,7 @@ public sealed class MediaCleanupContributor : IScenarioCleanupContributor
     public ApplicationProgrammingInterface Host => ApplicationProgrammingInterface.Media;
     public async Task ClearUserDataAsync(IServiceProvider sutServices, CancellationToken cancellationToken = default)
     {
+        sutServices.GetService<FakeMarketingInternalClient>()?.Reset();
         await using var scope = sutServices.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<MediaDbContext>();
         await db.Set<OutboxEvent>().IgnoreQueryFilters().ExecuteDeleteAsync(cancellationToken);
@@ -62,6 +65,10 @@ file sealed class MediaSutHost(WorkerOptions options, IReadOnlyDictionary<string
         services.AddSingleton<IStorageService, FakeStorageService>();
         services.RemoveAll<IScanService>();
         services.AddSingleton<IScanService, FakeScanService>();
+        services.RemoveAll<IMarketingInternalClient>();
+        services.AddSingleton<FakeMarketingInternalClient>();
+        services.AddSingleton<IMarketingInternalClient>(sp =>
+            sp.GetRequiredService<FakeMarketingInternalClient>());
         services.AddHostedService(sp => new MediaMigrationService(sp));
     }
 }
