@@ -66,8 +66,8 @@
 
   <ItemGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props') And $(MSBuildProjectName.EndsWith('.Functional'))">
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
-    <PackageReference Include="Reqnroll" Version="2.2.0" />
-    <PackageReference Include="Reqnroll.MSTest" Version="2.2.0" />
+    <PackageReference Include="Reqnroll" Version="3.3.4" />
+    <PackageReference Include="Reqnroll.MSTest" Version="3.3.4" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.6.3" />
     <PackageReference Include="MSTest.TestFramework" Version="3.6.3" />
     <PackageReference Include="FluentAssertions" Version="6.12.2" />
@@ -87,7 +87,7 @@
 
   <!-- Standalone BC repos: architecture analyzers from GitHub Packages. -->
   <PropertyGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props')">
-    <ArchitecturePackageVersion Condition="'$(ArchitecturePackageVersion)' == ''">2.0.0</ArchitecturePackageVersion>
+    <ArchitecturePackageVersion Condition="'$(ArchitecturePackageVersion)' == ''">2.8.3</ArchitecturePackageVersion>
   </PropertyGroup>
 
   <ItemGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props') And !$(MSBuildProjectName.EndsWith('.Unit')) And !$(MSBuildProjectName.EndsWith('.Functional'))">

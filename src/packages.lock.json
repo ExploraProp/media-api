@@ -4,9 +4,9 @@
     "net10.0": {
       "Architecture": {
         "type": "Direct",
-        "requested": "[2.0.0, )",
-        "resolved": "2.0.1",
-        "contentHash": "M5M7HtyugwkI6BzwN3xHHmAexL2/RvZ5BkOF8FeWS6VW3Sr4Em1zz0T1/pa0G2lqD114XiopcyDGj1zUKGRDpQ=="
+        "requested": "[2.8.3, )",
+        "resolved": "2.8.3",
+        "contentHash": "eVekh+5icUbB/TCYYoQVEGmvx9LgMgmX8fuOkmMQpYoLbx/b2s6A6wOtjlS2isJsRpzW6WE5gpkMM/c4ODf0sA=="
       },
       "ExploraProp.Marketing.Internal.ApiClient": {
         "type": "Direct",
