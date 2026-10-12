@@ -29,7 +29,7 @@ Feature: MediaApproval
 
   @failure
   Scenario: approving unknown media file is not found
-    When the scanner approves media file "00000000-0000-0000-0000-000000000000"
+    When the scanner approves an unknown media file
     Then they should see the media error
       | code               |
       | MediaFile.NotFound |
@@ -46,7 +46,7 @@ Feature: MediaApproval
 
   @failure
   Scenario: deleting unknown media file is not found
-    When deletes media file "00000000-0000-0000-0000-000000000000"
+    When deletes an unknown media file
     Then they should see the media error
       | code               |
       | MediaFile.NotFound |

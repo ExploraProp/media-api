@@ -25,6 +25,9 @@ public sealed class MediaUploadSteps(
     MediaApiClient mediaApi,
     FeatureContext featureContext)
 {
+    private static readonly string UnknownId = Guid.Empty.ToString();
+    private const string MalformedId = "not-a-guid";
+
     private readonly ScenarioContext _scenarioContext = scenarioContext;
     private readonly MediaApiClient _mediaApi = mediaApi;
     private readonly Worker _worker = featureContext.Get<Worker>();
@@ -61,8 +64,8 @@ public sealed class MediaUploadSteps(
         await LookUpMediaAsync(id);
     }
 
-    [When(@"looks up media file ""(.*)""")]
-    public Task LooksUpMediaFile(string mediaFileId) => LookUpMediaAsync(mediaFileId);
+    [When(@"looks up an unknown media file")]
+    public Task LooksUpAnUnknownMediaFile() => LookUpMediaAsync(UnknownId);
 
     [When(@"subscribes to scan events for the uploaded media file")]
     public async Task SubscribesToScanEventsForTheUploadedMediaFile()
@@ -71,9 +74,13 @@ public sealed class MediaUploadSteps(
         await SubscribeToEventsAsync(id);
     }
 
-    [When(@"subscribes to scan events for media file ""(.*)""")]
-    public Task SubscribesToScanEventsForMediaFile(string mediaFileId) =>
-        SubscribeToEventsAsync(mediaFileId);
+    [When(@"subscribes to scan events for an unknown media file")]
+    public Task SubscribesToScanEventsForAnUnknownMediaFile() =>
+        SubscribeToEventsAsync(UnknownId);
+
+    [When(@"subscribes to scan events for a malformed media file")]
+    public Task SubscribesToScanEventsForAMalformedMediaFile() =>
+        SubscribeToEventsAsync(MalformedId);
 
     private async Task UploadAsync(Stream stream, string fileName, string contentType)
     {

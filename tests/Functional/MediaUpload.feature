@@ -65,7 +65,7 @@ Feature: MediaUpload
 
   @failure
   Scenario: looks up unknown media file
-    When looks up media file "00000000-0000-0000-0000-000000000000"
+    When looks up an unknown media file
     Then they should see the media error
       | code               |
       | MediaFile.NotFound |
@@ -83,14 +83,14 @@ Feature: MediaUpload
 
   @failure
   Scenario: subscribes to events for unknown media file
-    When subscribes to scan events for media file "00000000-0000-0000-0000-000000000000"
+    When subscribes to scan events for an unknown media file
     Then they should see the media error
       | code               |
       | MediaFile.NotFound |
 
   @failure
   Scenario: malformed media id is rejected for scan events
-    When subscribes to scan events for media file "not-a-guid"
+    When subscribes to scan events for a malformed media file
     Then they should see the media error
       | code                      |
       | MediaFileId.InvalidFormat |

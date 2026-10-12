@@ -23,6 +23,9 @@ public sealed class MediaApprovalSteps(
     MediaApiClient mediaApi,
     FeatureContext featureContext)
 {
+    private static readonly Guid UnknownId = Guid.Empty;
+    private static readonly string UnknownIdText = UnknownId.ToString();
+
     private readonly ScenarioContext _scenarioContext = scenarioContext;
     private readonly MediaApiClient _mediaApi = mediaApi;
     private readonly Worker _worker = featureContext.Get<Worker>();
@@ -35,9 +38,9 @@ public sealed class MediaApprovalSteps(
         await ApproveAsync(id);
     }
 
-    [When(@"the scanner approves media file ""(.*)""")]
-    public Task TheScannerApprovesMediaFile(string mediaFileId) =>
-        ApproveAsync(Guid.Parse(mediaFileId));
+    [When(@"the scanner approves an unknown media file")]
+    public Task TheScannerApprovesAnUnknownMediaFile() =>
+        ApproveAsync(UnknownId);
 
     [Given(@"the scanner has started scanning the uploaded photo")]
     public async Task TheScannerHasStartedScanningTheUploadedPhoto()
@@ -64,8 +67,8 @@ public sealed class MediaApprovalSteps(
         await DeleteMediaAsync(id);
     }
 
-    [When(@"deletes media file ""(.*)""")]
-    public Task DeletesMediaFile(string mediaFileId) => DeleteMediaAsync(mediaFileId);
+    [When(@"deletes an unknown media file")]
+    public Task DeletesAnUnknownMediaFile() => DeleteMediaAsync(UnknownIdText);
 
     private async Task ApproveAsync(Guid mediaFileId)
     {
