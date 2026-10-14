@@ -87,7 +87,7 @@
 
   <!-- Standalone BC repos: architecture analyzers from GitHub Packages. -->
   <PropertyGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props')">
-    <ArchitecturePackageVersion Condition="'$(ArchitecturePackageVersion)' == ''">2.8.3</ArchitecturePackageVersion>
+    <ArchitecturePackageVersion Condition="'$(ArchitecturePackageVersion)' == ''">2.8.4</ArchitecturePackageVersion>
   </PropertyGroup>
 
   <ItemGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props') And !$(MSBuildProjectName.EndsWith('.Unit')) And !$(MSBuildProjectName.EndsWith('.Functional'))">

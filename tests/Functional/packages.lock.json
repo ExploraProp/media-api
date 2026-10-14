@@ -1220,6 +1220,21 @@
           "Microsoft.Kiota.Bundle": "[2.1.1, )",
           "Microsoft.Kiota.Http.HttpClientLibrary": "[2.1.1, )",
           "Microsoft.OpenApi": "[2.12.2, )",
+          "Newtonsoft.Json": "[13.0.3, )",
+          "SharedKernel.ApiClient": "[1.0.0, )",
+          "System.Security.Cryptography.Xml": "[10.0.12, )"
+        }
+      },
+      "exploraprop.session.internal.apiclient": {
+        "type": "Project",
+        "dependencies": {
+          "Microsoft.AspNetCore.DataProtection": "[10.0.12, )",
+          "Microsoft.Kiota.Abstractions": "[2.1.1, )",
+          "Microsoft.Kiota.Bundle": "[2.1.1, )",
+          "Microsoft.Kiota.Http.HttpClientLibrary": "[2.1.1, )",
+          "Microsoft.OpenApi": "[2.12.2, )",
+          "Newtonsoft.Json": "[13.0.3, )",
+          "SharedKernel.ApiClient": "[1.0.0, )",
           "System.Security.Cryptography.Xml": "[10.0.12, )"
         }
       },
@@ -1289,7 +1304,7 @@
           "Reqnroll": "[3.3.4, )",
           "Reqnroll.MSTest": "[3.3.4, )",
           "SSH.NET": "[2026.0.0, )",
-          "SharedKernel": "[2.0.35, )",
+          "SharedKernel": "[2.0.36, )",
           "StackExchange.Redis": "[2.8.24, )",
           "Testcontainers": "[4.2.0, )",
           "Testcontainers.MsSql": "[4.2.0, )",
