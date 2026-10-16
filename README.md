@@ -32,7 +32,7 @@ src/Infrastructure/   EF, storage/scanning integrations, migrations, schema docs
 tests/Unit/           Unit tests
 tests/Functional/     Reqnroll + mesh functional tests
 scripts/seeding/      Canonical seed-database.sql
-clients/              Ephemeral Kiota client (gitignored)
+clients/              Ephemeral API client (gitignored)
 docs/                 ERROR_CATALOG.md, errors.html
 .config/              Local dotnet tools
 ```
@@ -95,7 +95,7 @@ Remove-Item Env:SIBLING_IMAGE_TAG
 
 ## OpenAPI, contracts & clients
 
-`publish-openapi.yml` publishes public and internal contracts; SDK workflows consume those contracts to publish Kiota packages. Regenerate locally with `generate-openapi` and `generate-client`.
+`publish-openapi.yml` publishes public and internal contracts; SDK workflows consume those contracts to publish client packages. Regenerate locally with `generate-openapi` and `generate-client`.
 
 ## Error catalog
 
