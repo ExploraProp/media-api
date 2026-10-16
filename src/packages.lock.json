@@ -8,15 +8,6 @@
         "resolved": "2.8.4",
         "contentHash": "YB9Ldwd06YTWU9QjQ1AL+7fI2X8qrQeAe8+0/A56MfHoLc42qNFV3LsBzl6SMd7HUZjT4LMN58rFFZhfvaZFDg=="
       },
-      "ExploraProp.Marketing.Internal.ApiClient": {
-        "type": "Direct",
-        "requested": "[2026.*, )",
-        "resolved": "2026.9.16.1121",
-        "contentHash": "CsqY/xKub7hCVze2IJ+DCRsOQKz/389+EHgbJHkHu4ozfwtxzoRFCW04bI4bVblh3ZhEbWj0Xw0Zrd5aaBZ5jg==",
-        "dependencies": {
-          "Microsoft.Kiota.Bundle": "2.1.1"
-        }
-      },
       "MediatR": {
         "type": "Direct",
         "requested": "[13.1.0, )",
@@ -58,38 +49,6 @@
         "dependencies": {
           "Microsoft.Data.SqlClient": "6.1.6",
           "Microsoft.EntityFrameworkCore.Relational": "10.0.12"
-        }
-      },
-      "Microsoft.Kiota.Abstractions": {
-        "type": "Direct",
-        "requested": "[2.1.1, )",
-        "resolved": "2.1.1",
-        "contentHash": "baV/JJXkuMFZsEpLJUmE1mJUQ38AMG6bTob7lnZMNezwp51HSrIDIWDcHb80pMHOaHg+j5YEh5BSD4LHlXzphw==",
-        "dependencies": {
-          "Std.UriTemplate": "2.0.12"
-        }
-      },
-      "Microsoft.Kiota.Bundle": {
-        "type": "Direct",
-        "requested": "[2.1.1, )",
-        "resolved": "2.1.1",
-        "contentHash": "S4/Qdg95izIVg1eNVJcHjERIjrWa3VlQP5Ihe2ObIh/7rbUFyg4czeEZTox/F9hTOCNIH3XgHgBqwVN77i128g==",
-        "dependencies": {
-          "Microsoft.Kiota.Abstractions": "2.1.1",
-          "Microsoft.Kiota.Http.HttpClientLibrary": "2.1.1",
-          "Microsoft.Kiota.Serialization.Form": "2.1.1",
-          "Microsoft.Kiota.Serialization.Json": "2.1.1",
-          "Microsoft.Kiota.Serialization.Multipart": "2.1.1",
-          "Microsoft.Kiota.Serialization.Text": "2.1.1"
-        }
-      },
-      "Microsoft.Kiota.Http.HttpClientLibrary": {
-        "type": "Direct",
-        "requested": "[2.1.1, )",
-        "resolved": "2.1.1",
-        "contentHash": "y/BgWE6DXVheIHFU56A+jyjhUgQQzvPRsBlzgsGh64kRqqT8YPjUF8L+huq0hJD9QqbMeJZ7vC0OdFFdepYGXQ==",
-        "dependencies": {
-          "Microsoft.Kiota.Abstractions": "2.1.1"
         }
       },
       "Microsoft.OpenApi": {
@@ -454,47 +413,6 @@
           "Microsoft.IdentityModel.Logging": "8.14.0"
         }
       },
-      "Microsoft.IO.RecyclableMemoryStream": {
-        "type": "Transitive",
-        "resolved": "3.0.1",
-        "contentHash": "s/s20YTVY9r9TPfTrN5g8zPF1YhwxyqO6PxUkrYTGI2B+OGPe9AdajWZrLhFqXIvqIW23fnUE4+ztrUWNU1+9g=="
-      },
-      "Microsoft.Kiota.Serialization.Form": {
-        "type": "Transitive",
-        "resolved": "2.1.1",
-        "contentHash": "74eI5Zdp9QTzNdCTTk6+GyqmbKvVTpQQOJ9jbRtrCjBPs2RT+u+zOhiEiaJFNl6xYditSR3DSNxR9bUcgnEt1g==",
-        "dependencies": {
-          "Microsoft.IO.RecyclableMemoryStream": "3.0.1",
-          "Microsoft.Kiota.Abstractions": "2.1.1"
-        }
-      },
-      "Microsoft.Kiota.Serialization.Json": {
-        "type": "Transitive",
-        "resolved": "2.1.1",
-        "contentHash": "OP1faSt0D8zFfuIREwWp+LBGPTF931LCU0c0dYJ7ak/AJ3VeaxqMRHsjxeiF5COUDI998ho9Bx9DZTXWSmm1gg==",
-        "dependencies": {
-          "Microsoft.IO.RecyclableMemoryStream": "3.0.1",
-          "Microsoft.Kiota.Abstractions": "2.1.1"
-        }
-      },
-      "Microsoft.Kiota.Serialization.Multipart": {
-        "type": "Transitive",
-        "resolved": "2.1.1",
-        "contentHash": "g+YuE+xKQbKK/ToKVTU7C1rkmscU8IsxMAVVNRU73+T/7qPbkye4ova9cBblnrvk/l+7CGZD+Chec9uJHFYttA==",
-        "dependencies": {
-          "Microsoft.IO.RecyclableMemoryStream": "3.0.1",
-          "Microsoft.Kiota.Abstractions": "2.1.1"
-        }
-      },
-      "Microsoft.Kiota.Serialization.Text": {
-        "type": "Transitive",
-        "resolved": "2.1.1",
-        "contentHash": "sI2bAMKHLFGAUe4QGqPc8HFr4UYSbJCwpYMcx3mDUuevF4s6sAYRvIyoTYkKvSTCxUqt02B1USsJZWBmvo37KA==",
-        "dependencies": {
-          "Microsoft.IO.RecyclableMemoryStream": "3.0.1",
-          "Microsoft.Kiota.Abstractions": "2.1.1"
-        }
-      },
       "Microsoft.SqlServer.Server": {
         "type": "Transitive",
         "resolved": "1.0.0",
@@ -608,6 +526,11 @@
         "resolved": "2.16.15",
         "contentHash": "gCwx1CmfNIY4jlz4KAsiZrnUnz9UP+PhnM/rNQV3xcl4bnCaFVNhEBNrTMY9mi1QnsAJ32GeXCYu6DkSR2MHrQ=="
       },
+      "SharedKernel.ApiClient": {
+        "type": "Transitive",
+        "resolved": "1.0.0",
+        "contentHash": "bS1dOx4Cp7LB/Hz8NB9w0EPZfdNzC0CKoimRhi5FVUviOqXP0nH6LV7EmObyONE3XhMiLIUMY4NI52Nr6mvskg=="
+      },
       "StackExchange.Redis": {
         "type": "Transitive",
         "resolved": "2.8.24",
@@ -615,11 +538,6 @@
         "dependencies": {
           "Pipelines.Sockets.Unofficial": "2.2.8"
         }
-      },
-      "Std.UriTemplate": {
-        "type": "Transitive",
-        "resolved": "2.0.12",
-        "contentHash": "b/w8GfmVjf5c+8sTtGRVuwj6uC5KoPIn8+795xKlnGBBtph4FIVvgJVnh+x9dbDOkrst7XivIDJgyZSDFNsOYA=="
       },
       "System.ClientModel": {
         "type": "Transitive",
@@ -726,6 +644,14 @@
         "type": "Transitive",
         "resolved": "9.0.11",
         "contentHash": "s8yUYuYYu+PAwvBdhLG1KyrGrk9gkYeuPxfAsXsTqqWyepwSyEw8hAaflW4nO98NG52YpYI1am2+9o+79h2RtQ=="
+      },
+      "exploraprop.marketing.internal.apiclient": {
+        "type": "Project",
+        "dependencies": {
+          "Microsoft.OpenApi": "[2.12.2, )",
+          "Newtonsoft.Json": "[13.0.3, )",
+          "SharedKernel.ApiClient": "[1.0.0, )"
+        }
       }
     }
   }
