@@ -37,10 +37,10 @@ public sealed class FakeMarketingInternalClient : IMarketingInternalClient
             : MarketingClientResult<bool>.Fail(status));
     }
 
-    public Task<MarketingClientResult<ListingIndexDto?>> GetListingByIdWithDetailsAsync(
+    public Task<MarketingClientResult<ListingIndexDto>> GetListingByIdWithDetailsAsync(
         Guid listingId,
         CancellationToken cancellationToken = default)
-        => Task.FromResult(MarketingClientResult<ListingIndexDto?>.Fail(HttpStatusCode.NotFound));
+        => Task.FromResult(MarketingClientResult<ListingIndexDto>.Fail(HttpStatusCode.NotFound));
 
     public Task<MarketingClientResult<IReadOnlyList<ListingIndexDto>>> GetListingsByPropertyIdAsync(
         Guid propertyId,
