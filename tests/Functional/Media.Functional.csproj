@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <!-- Local harness while NuGet lags NSwag Country-style support. -->
+    <!-- Local SharedKernel.Functional harness (ProjectReference). -->
     <ProjectReference Include="..\..\..\..\tools\packages\SharedKernel\tests\Functional\SharedKernel.Functional.csproj" />
     <ProjectReference Include="..\..\..\..\tools\packages\SharedKernel\src\ApiClient\SharedKernel.ApiClient.csproj" />
     <ProjectReference Include="..\..\src\API\Media.API.csproj" />
