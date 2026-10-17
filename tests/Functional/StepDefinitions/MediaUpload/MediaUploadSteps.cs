@@ -92,7 +92,6 @@ public sealed class MediaUploadSteps(
             using var content = new MultipartFormDataContent();
             content.Add(new StringContent(OwnerType.Listing.ToI18nCode()), "OwnerType");
             content.Add(new StringContent(listingId.ToString()), "OwnerId");
-            content.Add(new StringContent("photo"), "MediaType");
 
             var fileContent = new StreamContent(stream);
             fileContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
@@ -140,8 +139,6 @@ public sealed class MediaUploadSteps(
                 PublicUrl = root.TryGetProperty("publicUrl", out var pu) ? pu.GetString() : null,
                 OwnerType = root.TryGetProperty("ownerType", out var ot) ? ot.GetString() ?? "" : "",
                 OwnerTypeLabel = root.TryGetProperty("ownerTypeLabel", out var otl) ? otl.GetString() ?? "" : "",
-                MediaType = root.TryGetProperty("mediaType", out var mt) ? mt.GetString() ?? "" : "",
-                MediaTypeLabel = root.TryGetProperty("mediaTypeLabel", out var mtl) ? mtl.GetString() ?? "" : "",
                 UploadedAt = root.TryGetProperty("uploadedAt", out var ua) ? ua.GetString() ?? "" : "",
                 CreatedAt = root.TryGetProperty("createdAt", out var ca) ? ca.GetString() ?? "" : "",
                 UpdatedAt = root.TryGetProperty("updatedAt", out var uat) ? uat.GetString() ?? "" : "",
@@ -213,11 +210,17 @@ public sealed class MediaUploadSteps(
         await using var scope = _worker.Services.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<MediaDbContext>();
         var ownerId = new OwnerId(listingId);
-        var rows = await db.MediaFile.AsNoTracking().ToListAsync();
-        return rows
+        var ready = await db.MediaFile.AsNoTracking()
             .Where(m => m.OwnerId == ownerId)
+            .Select(m => new { Id = m.Id.ToString(), m.CreatedAt })
+            .ToListAsync();
+        var uploads = await db.MediaUpload.AsNoTracking()
+            .Where(m => m.OwnerId == ownerId)
+            .Select(m => new { Id = m.Id.ToString(), m.CreatedAt })
+            .ToListAsync();
+        return ready.Concat(uploads)
             .OrderByDescending(m => m.CreatedAt)
-            .Select(m => m.Id.ToString())
+            .Select(m => m.Id)
             .FirstOrDefault();
     }
 

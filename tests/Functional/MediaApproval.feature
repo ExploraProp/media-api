@@ -53,8 +53,8 @@ Feature: MediaApproval
 
   @failure
   Scenario: secondary consumer cannot delete media file
-
     Only the owning publisher may delete media.
+
     Given uploads a photo to the listing
     And restores the secondary auth token
     When deletes the uploaded media file
@@ -68,5 +68,5 @@ Feature: MediaApproval
     And the scanner has started scanning the uploaded photo
     When deletes the uploaded media file
     Then they should see the media error
-      | code                      |
-      | MediaFile.Status.Scanning |
+      | code                        |
+      | MediaUpload.Status.Scanning |

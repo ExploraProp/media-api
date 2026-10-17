@@ -9,7 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Reqnroll;
 using UploadedByClientId = Media.Domain.ValueObjects.Ids.UploadedByClientId;
-using UploadMediaType = Media.Domain.Enums.Properties.MediaType;
+using MediaFileEntity = Media.Domain.Entities.Definitions.MediaFile;
+using MediaUploadEntity = Media.Domain.Entities.Definitions.MediaUpload;
 
 namespace Media.Functional.StepDefinitions.MediaUpload;
 
@@ -59,20 +60,33 @@ public sealed class MediaUploadBackgroundSteps(
         var listingId = _scenarioContext.Get(MediaUploadKeys.ListingOwnerId);
         await using var scope = _worker.Services.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<MediaDbContext>();
+        var maxCount = (await db.MediaPolicy.SingleAsync(p => p.OwnerType == OwnerType.Listing))
+            .MaxMediaCount.Value;
 
-        for (var i = 0; i < 50; i++)
+        for (var i = 0; i < maxCount; i++)
         {
-            var mediaFile = MediaFile.Create(
+            var upload = MediaUploadEntity.Create(
                 MediaFileId.New(),
                 new OwnerId(listingId),
                 OwnerType.Listing,
-                UploadMediaType.Photo,
-                MediaStatus.Pending,
                 StoragePath.FromDatabase($"quarantine/listing/{listingId}/{Guid.NewGuid()}.jpg"),
                 AllowedContentTypes.Jpeg,
                 MediaFileSize.FromDatabase(1024),
                 UploadedByClientId.New()).Value!;
-            db.MediaFile.Add(mediaFile);
+            upload.BeginScan();
+            var readyUrl = $"https://example.com/listing/{listingId}/{Guid.NewGuid()}.jpg";
+            var ready = MediaFileEntity.Create(
+                upload,
+                AccessLevel.Public,
+                [
+                    new PromotedVariantInput(
+                        VariantType.Original,
+                        Link.FromDatabase(readyUrl),
+                        null,
+                        MediaFileSize.FromDatabase(1024)),
+                ]).Value!;
+            ready.ClearDomainEvents();
+            db.MediaFile.Add(ready);
         }
 
         await db.SaveChangesAsync();

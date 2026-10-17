@@ -47,16 +47,16 @@ public sealed class MediaApprovalSteps(
     {
         var mediaId = _scenarioContext.Get(MediaUploadKeys.MediaFileId);
         await using var scope = _worker.Services.CreateAsyncScope();
-        var mediaRepo = scope.ServiceProvider.GetRequiredService<IMediaRepo>();
+        var mediaUploadRepo = scope.ServiceProvider.GetRequiredService<IMediaUploadRepo>();
         var idResult = MediaFileId.Create(mediaId);
         idResult.IsSuccess.Should().BeTrue();
-        var fileResult = await mediaRepo.GetByIdAsync(idResult.Value!, CancellationToken.None);
+        var fileResult = await mediaUploadRepo.GetByIdAsync(idResult.Value!, CancellationToken.None);
         fileResult.IsSuccess.Should().BeTrue();
         var file = fileResult.Value!;
         if (file.Status == MediaStatus.Pending)
         {
             file.BeginScan();
-            await mediaRepo.UpdateAsync(file, CancellationToken.None);
+            await mediaUploadRepo.UpdateAsync(file, CancellationToken.None);
         }
     }
 
@@ -81,26 +81,26 @@ public sealed class MediaApprovalSteps(
             return;
         }
 
-        var mediaRepo = scope.ServiceProvider.GetRequiredService<IMediaRepo>();
-        var mediaFileResult = await mediaRepo.GetByIdAsync(idResult.Value!, CancellationToken.None);
-        if (mediaFileResult.IsSuccess && mediaFileResult.Value!.Status == MediaStatus.Pending)
+        var mediaUploadRepo = scope.ServiceProvider.GetRequiredService<IMediaUploadRepo>();
+        var uploadResult = await mediaUploadRepo.GetByIdAsync(idResult.Value!, CancellationToken.None);
+        if (uploadResult.IsSuccess && uploadResult.Value!.Status == MediaStatus.Pending)
         {
-            var beginResult = mediaFileResult.Value!.BeginScan();
+            var beginResult = uploadResult.Value!.BeginScan();
             if (beginResult.IsSuccess)
-                await mediaRepo.UpdateAsync(mediaFileResult.Value!, CancellationToken.None);
+                await mediaUploadRepo.UpdateAsync(uploadResult.Value!, CancellationToken.None);
         }
 
         var result = await mediator.Send(new ApproveMediaCommand(idResult.Value!), CancellationToken.None);
         if (result.IsSuccess && result.Value is not null)
         {
-            var nswagDto = ToNSwagDto(result.Value);
+            var clientDto = ToClientDto(result.Value);
             var response = new SwaggerResponse<MediaFileDto>(
                 (int)HttpStatusCode.OK,
                 new Dictionary<string, IEnumerable<string>>(),
-                nswagDto);
+                clientDto);
             _scenarioContext.Put(MediaApprovalKeys.ApproveMedia, response);
             _scenarioContext.Put(MediaUploadKeys.UploadMedia, response);
-            _scenarioContext.Put(MediaUploadKeys.MediaFileId, nswagDto.Id);
+            _scenarioContext.Put(MediaUploadKeys.MediaFileId, clientDto.Id);
             _scenarioContext.Remove(MediaUploadKeys.ProblemDetails);
             return;
         }
@@ -134,7 +134,7 @@ public sealed class MediaApprovalSteps(
             });
     }
 
-    private static MediaFileDto ToNSwagDto(Media.Application.Dto.MediaFileDto dto) =>
+    private static MediaFileDto ToClientDto(Media.Application.Dto.MediaFileDto dto) =>
         new()
         {
             Id = dto.Id,
@@ -145,8 +145,6 @@ public sealed class MediaApprovalSteps(
             PublicUrl = dto.PublicUrl,
             OwnerType = dto.OwnerType,
             OwnerTypeLabel = dto.OwnerTypeLabel,
-            MediaType = dto.MediaType,
-            MediaTypeLabel = dto.MediaTypeLabel,
             UploadedAt = dto.UploadedAt,
             Variants = dto.Variants?
                 .Select(v => new MediaVariantDto
@@ -154,6 +152,14 @@ public sealed class MediaApprovalSteps(
                     Type = v.Type,
                     TypeLabel = v.TypeLabel,
                     Url = v.Url,
+                    Metadata = v.Metadata is null
+                        ? null
+                        : new MediaVariantMetadataDto
+                        {
+                            Width = v.Metadata.Width,
+                            Height = v.Metadata.Height,
+                        },
+                    FileSizeBytes = v.FileSizeBytes,
                 })
                 .ToList() ?? [],
         };
