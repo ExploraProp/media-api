@@ -9,6 +9,8 @@ Owns media files, variants, upload policies, and internal media URL reads for si
 | Public SDK | [csharp_media_sdk](https://github.com/ExploraProp/csharp_media_sdk) (`ExploraProp.Media.ApiClient`) |
 | Internal SDK | [csharp_media_internal_sdk](https://github.com/ExploraProp/csharp_media_internal_sdk) (`ExploraProp.Media.Internal.ApiClient`) |
 | Contracts | [openapi-contracts](https://github.com/ExploraProp/openapi-contracts) / [openapi-contracts-internal](https://github.com/ExploraProp/openapi-contracts-internal) |
+| Scalar (public) | http://localhost:7005/scalar/v1 |
+| Scalar (internal) | http://localhost:7005/scalar/internal |
 | CI | In-tree `.github/workflows/` (secrets wired per BC) |
 
 ## Prerequisites
@@ -30,7 +32,7 @@ src/Infrastructure/   EF, storage/scanning integrations, migrations, schema docs
 tests/Unit/           Unit tests
 tests/Functional/     Reqnroll + mesh functional tests
 scripts/seeding/      Canonical seed-database.sql
-clients/              Ephemeral Kiota client (gitignored)
+clients/              Ephemeral API client (gitignored)
 docs/                 ERROR_CATALOG.md, errors.html
 .config/              Local dotnet tools
 ```
@@ -49,12 +51,13 @@ docs/                 ERROR_CATALOG.md, errors.html
 
 ```powershell
 Copy-Item src/API/.env.example src/API/.env
+# ImageSharp 4.x: set SIXLABORS_LICENSE_KEY to the full contents of sixlabors.lic, then:
+#   $env:SIXLABORS_LICENSE_KEY = '<paste license string>'
 dotnet tool run api-scripts -- secrets-local --service Media
 dotnet restore Media.slnx
 dotnet build Media.slnx -c Release
 dotnet test tests/Unit/Media.Unit.csproj -c Release
 ```
-
 Run from `src/API`:
 
 ```powershell
@@ -92,7 +95,7 @@ Remove-Item Env:SIBLING_IMAGE_TAG
 
 ## OpenAPI, contracts & clients
 
-`publish-openapi.yml` publishes public and internal contracts; SDK workflows consume those contracts to publish Kiota packages. Regenerate locally with `generate-openapi` and `generate-client`.
+`publish-openapi.yml` publishes public and internal contracts; SDK workflows consume those contracts to publish client packages. Regenerate locally with `generate-openapi` and `generate-client`.
 
 ## Error catalog
 

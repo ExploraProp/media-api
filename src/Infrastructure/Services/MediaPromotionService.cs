@@ -14,25 +14,26 @@ public sealed class MediaPromotionService(
     IImageProcessingService imageProcessingService) : IMediaPromotionService
 {
     public async Task<Result<MediaPromotionResult>> PromoteAsync(
-        MediaFile mediaFile,
+        MediaUpload upload,
         MediaPolicy policy,
         CancellationToken cancellationToken)
     {
-        var isPublic = policy.AccessLevel == AccessLevel.Public;
+        var accessLevel = policy.AccessLevel;
+        var isPublic = accessLevel == AccessLevel.Public;
         var promotionPath = MediaStoragePaths.BuildPromotionPath(
-            mediaFile.OwnerType,
-            mediaFile.OwnerId,
-            mediaFile.Id,
-            mediaFile.ContentType,
-            policy.AccessLevel);
+            upload.OwnerType,
+            upload.OwnerId,
+            upload.Id,
+            upload.ContentType,
+            accessLevel);
 
-        var downloadResult = 
-            await storageService.DownloadFileAsync(mediaFile.QuarantinePath.Value, cancellationToken);
+        var downloadResult =
+            await storageService.DownloadFileAsync(upload.QuarantinePath.Value, cancellationToken);
         if (downloadResult.IsFailure) return Result<MediaPromotionResult>.FromResult(downloadResult);
 
         await using var stream = downloadResult.Value!;
 
-        var mimeType = mediaFile.ContentType.ToMimeType();
+        var mimeType = upload.ContentType.ToMimeType();
         var uploadResult = await storageService.UploadStreamToPathAsync(
             stream, promotionPath, mimeType, isPublic, cancellationToken);
         if (uploadResult.IsFailure) return Result<MediaPromotionResult>.FromResult(uploadResult);
@@ -44,8 +45,7 @@ public sealed class MediaPromotionService(
         {
             var originalOnly = new PromotedVariantInput(
                 VariantType.Original,
-                VariantUrl.FromStorage(promotedUrl),
-                null,
+                Link.FromDatabase(promotedUrl),
                 null,
                 MediaFileSize.FromDatabase(stream.Length));
             return Result<MediaPromotionResult>.Success(
@@ -55,22 +55,22 @@ public sealed class MediaPromotionService(
         stream.Position = 0;
 
         var baseStoragePath = MediaStoragePaths.BuildBaseStoragePath(
-            mediaFile.OwnerType, mediaFile.OwnerId, policy.AccessLevel);
+            upload.OwnerType, upload.OwnerId, accessLevel);
         var applyWatermark = policy.WatermarkEnabled && isPublic;
 
         var variantsResult = await imageProcessingService.GenerateVariantsAsync(
             stream,
-            mediaFile.Id,
+            upload.Id,
             baseStoragePath,
-            mediaFile.ContentType,
+            upload.ContentType,
             applyWatermark,
-            mediaFile.OwnerType.GetVariantsToGenerate(),
+            upload.OwnerType.GetVariantsToGenerate(),
             cancellationToken);
         if (variantsResult.IsFailure) return Result<MediaPromotionResult>.FromResult(variantsResult);
 
         var domainVariantsResult = await UploadVariantsAsync(
             variantsResult.Value!,
-            mediaFile.Id,
+            upload.Id,
             baseStoragePath,
             promotedUrl,
             isPublic,
@@ -126,9 +126,8 @@ public sealed class MediaPromotionService(
 
                 promotedVariants.Add(new PromotedVariantInput(
                     processed.Type,
-                    VariantUrl.FromStorage(variantUrl),
-                    processed.Width.HasValue ? VariantDimension.From(processed.Width.Value) : null,
-                    processed.Height.HasValue ? VariantDimension.From(processed.Height.Value) : null,
+                    Link.FromDatabase(variantUrl),
+                    MediaVariantMetadata.FromDimensions(processed.Width, processed.Height),
                     MediaFileSize.FromDatabase(processed.FileSizeBytes)));
             }
         }

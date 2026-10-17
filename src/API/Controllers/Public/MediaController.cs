@@ -6,19 +6,19 @@ using Media.Domain.ValueObjects.Ids;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Media.API.Controllers;
+namespace Media.API.Controllers.Public;
 
 /// <summary>
 /// Handles media file upload and scan-result notification.
 /// </summary>
-public class MediaController(IMediator mediator) : BaseApiController
+public class MediaController(IMediator mediator) : PublicApiController
 {
     [HttpPost("upload")]
     [ProducesResponseType(typeof(MediaFileDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    [RequestSizeLimit(16 * 1024 * 1024)]
-    [RequestFormLimits(MultipartBodyLengthLimit = 16 * 1024 * 1024)]
+    [RequestSizeLimit(20 * 1024 * 1024)]
+    [RequestFormLimits(MultipartBodyLengthLimit = 20 * 1024 * 1024)]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> Upload([FromForm] UploadMediaDto dto, CancellationToken cancellationToken)
     {

@@ -1,6 +1,5 @@
 using Media.Domain.Entities.Definitions;
 using Media.Domain.ValueObjects.Ids;
-using Media.Domain.ValueObjects.Properties;
 using Media.Infrastructure.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -29,54 +28,9 @@ public sealed class MediaFileConfiguration : IEntityTypeConfiguration<MediaFile>
             .HasConversion<int>()
             .IsRequired();
 
-        builder.Property(e => e.MediaType)
-            .HasColumnName("MediaType")
-            .HasConversion<int>()
-            .IsRequired();
-
-        builder.Property(e => e.Status)
-            .HasColumnName("Status")
-            .HasConversion<int>()
-            .IsRequired();
-
-        builder.Property(e => e.QuarantinePath)
-            .HasConversion(v => v.Value, v => StoragePath.FromDatabase(v))
-            .HasColumnName("QuarantinePath")
-            .HasMaxLength(StoragePath.MaxLength)
-            .IsRequired();
-
-        builder.Property(e => e.PublicUrl)
-            .HasConversion(
-                v => v != null ? v.Value : null,
-                v => v != null ? Link.FromDatabase(v) : null)
-            .HasColumnName("PublicUrl")
-            .HasMaxLength(1024);
-
-        builder.Property(e => e.AccessLevel)
-            .HasColumnName("AccessLevel")
-            .HasConversion<int>()
-            .IsRequired();
-
         builder.Property(e => e.ContentType)
             .HasColumnName("ContentType")
             .HasConversion<int>()
-            .IsRequired();
-
-        builder.Property(e => e.FileSizeBytes)
-            .HasConversion(v => v.Value, v => MediaFileSize.FromDatabase(v))
-            .HasColumnName("FileSizeBytes")
-            .IsRequired();
-
-        builder.Property(e => e.UploadedAt)
-            .HasColumnName("UploadedAt")
-            .IsRequired();
-
-        builder.Property(e => e.ApprovedAt)
-            .HasColumnName("ApprovedAt");
-
-        builder.Property(e => e.ScanAttempts)
-            .HasConversion(v => v.Value, v => ScanAttemptCount.FromDatabase(v))
-            .HasColumnName("ScanAttempts")
             .IsRequired();
 
         builder.Property(e => e.UploadedByClientUserId)
@@ -93,8 +47,5 @@ public sealed class MediaFileConfiguration : IEntityTypeConfiguration<MediaFile>
 
         builder.HasIndex(e => new { e.OwnerId, e.OwnerType })
             .HasDatabaseName(MediaConstraints.MediaFileOwnerIdOwnerTypeIndex);
-
-        builder.HasIndex(e => e.Status)
-            .HasDatabaseName(MediaConstraints.MediaFileStatusIndex);
     }
 }

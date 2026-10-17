@@ -8,6 +8,9 @@
     <NullableReferenceTypesAnnotations>true</NullableReferenceTypesAnnotations>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <IsPackable>false</IsPackable>
+    <!-- ImageSharp 4.x build-time license (direct PackageReference only). -->
+    <SixLaborsLicenseFile Condition="'$(SixLaborsLicenseFile)' == '' and Exists('$(MSBuildThisFileDirectory)sixlabors.lic')">$(MSBuildThisFileDirectory)sixlabors.lic</SixLaborsLicenseFile>
+    <SixLaborsLicenseKey Condition="'$(SixLaborsLicenseKey)' == '' and '$(SIXLABORS_LICENSE_KEY)' != ''">$(SIXLABORS_LICENSE_KEY)</SixLaborsLicenseKey>
   </PropertyGroup>
 
   <!-- Security pins only when standalone (monorepo bridge pulls root Directory.Build.props). -->
@@ -15,11 +18,6 @@
     <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="10.0.12" />
     <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.12" />
     <PackageReference Include="Microsoft.OpenApi" Version="2.12.2" />
-    <!-- Kiota 1.20.1 arrives via the ExploraProp.*.Internal.ApiClient packages; the whole
-         family is pinned together so serializers cannot straddle the 1.x/2.x boundary. -->
-    <PackageReference Include="Microsoft.Kiota.Abstractions" Version="2.1.1" />
-    <PackageReference Include="Microsoft.Kiota.Http.HttpClientLibrary" Version="2.1.1" />
-    <PackageReference Include="Microsoft.Kiota.Bundle" Version="2.1.1" />
   </ItemGroup>
 
   <PropertyGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props')">
@@ -63,8 +61,8 @@
 
   <ItemGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props') And $(MSBuildProjectName.EndsWith('.Functional'))">
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
-    <PackageReference Include="Reqnroll" Version="2.2.0" />
-    <PackageReference Include="Reqnroll.MSTest" Version="2.2.0" />
+    <PackageReference Include="Reqnroll" Version="3.3.4" />
+    <PackageReference Include="Reqnroll.MSTest" Version="3.3.4" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.6.3" />
     <PackageReference Include="MSTest.TestFramework" Version="3.6.3" />
     <PackageReference Include="FluentAssertions" Version="6.12.2" />
@@ -84,7 +82,7 @@
 
   <!-- Standalone BC repos: architecture analyzers from GitHub Packages. -->
   <PropertyGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props')">
-    <ArchitecturePackageVersion Condition="'$(ArchitecturePackageVersion)' == ''">2.0.0</ArchitecturePackageVersion>
+    <ArchitecturePackageVersion Condition="'$(ArchitecturePackageVersion)' == ''">2.8.4</ArchitecturePackageVersion>
   </PropertyGroup>
 
   <ItemGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props') And !$(MSBuildProjectName.EndsWith('.Unit')) And !$(MSBuildProjectName.EndsWith('.Functional'))">

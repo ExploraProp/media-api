@@ -5,18 +5,16 @@
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
 
-  <data name="MediaFile.Status.Pending.Required.Title" xml:space="preserve"><value>El archivo no esta pendiente</value></data>
-  <data name="MediaFile.Status.Pending.Required.Description" xml:space="preserve"><value>El analisis solo puede iniciarse cuando el archivo esta pendiente.</value></data>
-  <data name="MediaFile.Status.Scanning.Required.Title" xml:space="preserve"><value>El archivo no se esta analizando</value></data>
-  <data name="MediaFile.Status.Scanning.Required.Description" xml:space="preserve"><value>Esta operacion requiere que el archivo este en estado de analisis.</value></data>
-  <data name="MediaFile.Status.Approved.Required.Title" xml:space="preserve"><value>El archivo no esta aprobado</value></data>
-  <data name="MediaFile.Status.Approved.Required.Description" xml:space="preserve"><value>El archivo de media solicitado todavia no ha sido aprobado.</value></data>
-  <data name="MediaFile.Status.Scanning.Title" xml:space="preserve"><value>El archivo se esta analizando</value></data>
-  <data name="MediaFile.Status.Scanning.Description" xml:space="preserve"><value>Espere a que termine el analisis antes de eliminar este archivo.</value></data>
-  <data name="MediaFile.AccessLevel.Public.Title" xml:space="preserve"><value>El archivo es publico</value></data>
-  <data name="MediaFile.AccessLevel.Public.Description" xml:space="preserve"><value>Este archivo de media es publico; use la URL publica para acceder.</value></data>
-  <data name="MediaFile.AccessLevel.Private.Title" xml:space="preserve"><value>El archivo es privado</value></data>
-  <data name="MediaFile.AccessLevel.Private.Description" xml:space="preserve"><value>Este archivo de media es privado; use una URL firmada para acceder.</value></data>
+  <data name="MediaUpload.Status.Pending.Required.Title" xml:space="preserve"><value>El archivo no esta pendiente</value></data>
+  <data name="MediaUpload.Status.Pending.Required.Description" xml:space="preserve"><value>El analisis solo puede iniciarse cuando el archivo esta pendiente.</value></data>
+  <data name="MediaUpload.Status.Scanning.Required.Title" xml:space="preserve"><value>El archivo no se esta analizando</value></data>
+  <data name="MediaUpload.Status.Scanning.Required.Description" xml:space="preserve"><value>Esta operacion requiere que el archivo este en estado de analisis.</value></data>
+  <data name="MediaUpload.Status.Scanning.Title" xml:space="preserve"><value>El archivo se esta analizando</value></data>
+  <data name="MediaUpload.Status.Scanning.Description" xml:space="preserve"><value>Espere a que termine el analisis antes de eliminar este archivo.</value></data>
+  <data name="MediaPolicy.AccessLevel.Public.Title" xml:space="preserve"><value>El archivo es publico</value></data>
+  <data name="MediaPolicy.AccessLevel.Public.Description" xml:space="preserve"><value>Este archivo de media es publico; use la URL publica para acceder.</value></data>
+  <data name="MediaPolicy.AccessLevel.Private.Title" xml:space="preserve"><value>El archivo es privado</value></data>
+  <data name="MediaPolicy.AccessLevel.Private.Description" xml:space="preserve"><value>Este archivo de media es privado; use una URL firmada para acceder.</value></data>
   <data name="MediaAccess.Owner.Invalid.Title" xml:space="preserve"><value>Permiso denegado</value></data>
   <data name="MediaAccess.Owner.Invalid.Description" xml:space="preserve"><value>El usuario no tiene permiso para acceder o modificar este archivo de media.</value></data>
   <data name="MediaPolicy.MaxFileSizeBytes.TooLarge.Title" xml:space="preserve"><value>El archivo es demasiado grande</value></data>
@@ -51,8 +49,6 @@
   <data name="AccessLevel.InvalidFormat.Description" xml:space="preserve"><value>El nivel de acceso debe ser public o private.</value></data>
   <data name="MediaStatus.InvalidFormat.Title" xml:space="preserve"><value>El estado de media no es valido</value></data>
   <data name="MediaStatus.InvalidFormat.Description" xml:space="preserve"><value>El estado de media no es valido.</value></data>
-  <data name="MediaType.InvalidFormat.Title" xml:space="preserve"><value>El tipo de media no es valido</value></data>
-  <data name="MediaType.InvalidFormat.Description" xml:space="preserve"><value>El tipo de media no es valido.</value></data>
   <data name="OwnerType.InvalidFormat.Title" xml:space="preserve"><value>El tipo de propietario no es valido</value></data>
   <data name="OwnerType.InvalidFormat.Description" xml:space="preserve"><value>El tipo de propietario debe ser user, listing, identification o verificationSubmission.</value></data>
   <data name="VariantType.InvalidFormat.Title" xml:space="preserve"><value>El tipo de variante no es valido</value></data>

@@ -37,9 +37,9 @@ public class MediaDomainErrorCoverageTests
     }
 
     [TestMethod]
-    public void StoragePath_FromQuarantineUpload_WithValidPath_ReturnsSuccess()
+    public void StoragePath_Create_WithValidPath_ReturnsSuccess()
     {
-        var result = StoragePath.FromQuarantineUpload("quarantine/listing/abc/file.jpg");
+        var result = StoragePath.Create("quarantine/listing/abc/file.jpg");
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual("quarantine/listing/abc/file.jpg", result.Value!.Value);
     }
@@ -50,22 +50,6 @@ public class MediaDomainErrorCoverageTests
         var result = MediaFileSize.Create(0);
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(MediaFileSizeError.InvalidFormat.Code.Value, result.Error!.Code.Value);
-    }
-
-    [TestMethod]
-    public void MediaMaxCount_Create_WithNonPositive_ReturnsNonPositiveError()
-    {
-        var result = MediaMaxCount.Create(0);
-        Assert.IsTrue(result.IsFailure);
-        Assert.AreEqual(MediaMaxCountError.Invalid.Code.Value, result.Error!.Code.Value);
-    }
-
-    [TestMethod]
-    public void MediaMaxFileSize_Create_WithNonPositive_ReturnsNonPositiveError()
-    {
-        var result = MediaMaxFileSize.Create(-1);
-        Assert.IsTrue(result.IsFailure);
-        Assert.AreEqual(MediaMaxFileSizeError.NonPositive.Code.Value, result.Error!.Code.Value);
     }
 
     [TestMethod]
@@ -93,14 +77,6 @@ public class MediaDomainErrorCoverageTests
     }
 
     [TestMethod]
-    public void MediaType_TryParse_WithInvalidValue_ReturnsInvalidError()
-    {
-        var result = MediaTypeExtensions.TryParseMediaType("not-a-type");
-        Assert.IsTrue(result.IsFailure);
-        Assert.AreEqual(MediaTypeError.Invalid.Code.Value, result.Error!.Code.Value);
-    }
-
-    [TestMethod]
     public void OwnerType_TryParse_WithInvalidValue_ReturnsInvalidError()
     {
         var result = OwnerTypeExtensions.TryParseOwnerType("not-an-owner");
@@ -125,80 +101,89 @@ public class MediaDomainErrorCoverageTests
     }
 
     [TestMethod]
-    public void MediaFile_BeginScan_WhenNotPending_ReturnsNotPendingError()
+    public void MediaUpload_BeginScan_WhenNotPending_ReturnsNotPendingError()
     {
-        var mediaFile = MediaFile.Create(
+        var upload = MediaUpload.Create(
             new MediaFileId(Guid.NewGuid()),
             new OwnerId(Guid.NewGuid()),
             OwnerType.Listing,
-            global::Media.Domain.Enums.Properties.MediaType.Photo,
-            MediaStatus.Approved,
             StoragePath.FromDatabase("quarantine/listing/owner/file.jpg"),
             AllowedContentTypes.Jpeg,
             MediaFileSize.FromDatabase(1024),
             UploadedByClientId.New()).Value!;
+        upload.BeginScan();
 
-        var result = mediaFile.BeginScan();
+        var result = upload.BeginScan();
         Assert.IsTrue(result.IsFailure);
-        Assert.AreEqual(MediaFileError.NotPending.Code.Value, result.Error!.Code.Value);
+        Assert.AreEqual(MediaUploadError.NotPending.Code.Value, result.Error!.Code.Value);
     }
 
     [TestMethod]
-    public void MediaFile_Approve_WhenNotScanning_ReturnsNotScanningError()
+    public void MediaUpload_Approve_WhenNotScanning_ReturnsNotScanningError()
     {
-        var mediaFile = MediaFile.Create(
+        var upload = MediaUpload.Create(
             new MediaFileId(Guid.NewGuid()),
             new OwnerId(Guid.NewGuid()),
             OwnerType.Listing,
-            global::Media.Domain.Enums.Properties.MediaType.Photo,
-            MediaStatus.Pending,
             StoragePath.FromDatabase("quarantine/listing/owner/file.jpg"),
             AllowedContentTypes.Jpeg,
             MediaFileSize.FromDatabase(1024),
             UploadedByClientId.New()).Value!;
 
-        var result = mediaFile.Approve(
-            "https://example.com/file.jpg",
-            AccessLevel.Public,
-            []);
+        var result = upload.Approve();
 
         Assert.IsTrue(result.IsFailure);
-        Assert.AreEqual(MediaFileError.NotScanning.Code.Value, result.Error!.Code.Value);
+        Assert.AreEqual(MediaUploadError.NotScanning.Code.Value, result.Error!.Code.Value);
     }
 
     [TestMethod]
-    public void MediaFile_Approve_WhenScanning_ShouldCreateVariantsAndRaiseEvent()
+    public void MediaUpload_Reject_WhenNotScanning_ReturnsNotScanningError()
     {
-        var mediaFileId = new MediaFileId(Guid.NewGuid());
-        var mediaFile = MediaFile.Create(
-            mediaFileId,
+        var upload = MediaUpload.Create(
+            new MediaFileId(Guid.NewGuid()),
             new OwnerId(Guid.NewGuid()),
             OwnerType.Listing,
-            global::Media.Domain.Enums.Properties.MediaType.Photo,
-            MediaStatus.Pending,
             StoragePath.FromDatabase("quarantine/listing/owner/file.jpg"),
             AllowedContentTypes.Jpeg,
             MediaFileSize.FromDatabase(1024),
             UploadedByClientId.New()).Value!;
-        mediaFile.BeginScan();
+
+        var result = upload.Reject("infected");
+
+        Assert.IsTrue(result.IsFailure);
+        Assert.AreEqual(MediaUploadError.NotScanning.Code.Value, result.Error!.Code.Value);
+    }
+
+    [TestMethod]
+    public void MediaFile_Create_FromScanningUpload_ShouldCreateVariantsAndRaiseEvent()
+    {
+        var upload = MediaUpload.Create(
+            new MediaFileId(Guid.NewGuid()),
+            new OwnerId(Guid.NewGuid()),
+            OwnerType.Listing,
+            StoragePath.FromDatabase("quarantine/listing/owner/file.jpg"),
+            AllowedContentTypes.Jpeg,
+            MediaFileSize.FromDatabase(1024),
+            UploadedByClientId.New()).Value!;
+        upload.BeginScan();
 
         var promotedVariants = new[]
         {
             new PromotedVariantInput(
                 VariantType.Original,
-                VariantUrl.FromStorage("https://example.com/original.jpg"),
-                null,
+                Link.FromDatabase("https://example.com/original.jpg"),
                 null,
                 MediaFileSize.FromDatabase(100)),
         };
 
-        var result = mediaFile.Approve(
-            "https://example.com/original.jpg",
+        var result = MediaFile.Create(
+            upload,
             AccessLevel.Public,
             promotedVariants);
 
         Assert.IsTrue(result.IsSuccess);
-        Assert.AreEqual(MediaStatus.Approved, mediaFile.Status);
+        var mediaFile = result.Value!;
+        Assert.AreEqual("https://example.com/original.jpg", mediaFile.ResolvePublicUrl(AccessLevel.Public));
         Assert.AreEqual(1, mediaFile.Variants.Count);
         Assert.AreEqual(1, mediaFile.DomainEvents.Count);
         Assert.IsInstanceOfType<global::Media.Domain.Events.FileApproved>(mediaFile.DomainEvents.First());

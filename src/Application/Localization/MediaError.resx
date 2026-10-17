@@ -5,18 +5,16 @@
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
 
-  <data name="MediaFile.Status.Pending.Required.Title" xml:space="preserve"><value>File is not pending</value></data>
-  <data name="MediaFile.Status.Pending.Required.Description" xml:space="preserve"><value>Scan can only be started when the file is pending.</value></data>
-  <data name="MediaFile.Status.Scanning.Required.Title" xml:space="preserve"><value>File is not being scanned</value></data>
-  <data name="MediaFile.Status.Scanning.Required.Description" xml:space="preserve"><value>This operation requires the file to be in Scanning status.</value></data>
-  <data name="MediaFile.Status.Approved.Required.Title" xml:space="preserve"><value>File is not approved</value></data>
-  <data name="MediaFile.Status.Approved.Required.Description" xml:space="preserve"><value>The requested media file has not been approved yet.</value></data>
-  <data name="MediaFile.Status.Scanning.Title" xml:space="preserve"><value>File is being scanned</value></data>
-  <data name="MediaFile.Status.Scanning.Description" xml:space="preserve"><value>Wait for the scan to complete before deleting this file.</value></data>
-  <data name="MediaFile.AccessLevel.Public.Title" xml:space="preserve"><value>File is public</value></data>
-  <data name="MediaFile.AccessLevel.Public.Description" xml:space="preserve"><value>This media file is public; use the public URL to access it.</value></data>
-  <data name="MediaFile.AccessLevel.Private.Title" xml:space="preserve"><value>File is private</value></data>
-  <data name="MediaFile.AccessLevel.Private.Description" xml:space="preserve"><value>This media file is private; use a signed URL to access it.</value></data>
+  <data name="MediaUpload.Status.Pending.Required.Title" xml:space="preserve"><value>File is not pending</value></data>
+  <data name="MediaUpload.Status.Pending.Required.Description" xml:space="preserve"><value>Scan can only be started when the file is pending.</value></data>
+  <data name="MediaUpload.Status.Scanning.Required.Title" xml:space="preserve"><value>File is not being scanned</value></data>
+  <data name="MediaUpload.Status.Scanning.Required.Description" xml:space="preserve"><value>This operation requires the file to be in Scanning status.</value></data>
+  <data name="MediaUpload.Status.Scanning.Title" xml:space="preserve"><value>File is being scanned</value></data>
+  <data name="MediaUpload.Status.Scanning.Description" xml:space="preserve"><value>Wait for the scan to complete before deleting this file.</value></data>
+  <data name="MediaPolicy.AccessLevel.Public.Title" xml:space="preserve"><value>File is public</value></data>
+  <data name="MediaPolicy.AccessLevel.Public.Description" xml:space="preserve"><value>This media file is public; use the public URL to access it.</value></data>
+  <data name="MediaPolicy.AccessLevel.Private.Title" xml:space="preserve"><value>File is private</value></data>
+  <data name="MediaPolicy.AccessLevel.Private.Description" xml:space="preserve"><value>This media file is private; use a signed URL to access it.</value></data>
   <data name="MediaAccess.Owner.Invalid.Title" xml:space="preserve"><value>Permission denied</value></data>
   <data name="MediaAccess.Owner.Invalid.Description" xml:space="preserve"><value>The user is not allowed to access or modify this media file.</value></data>
   <data name="MediaPolicy.MaxFileSizeBytes.TooLarge.Title" xml:space="preserve"><value>File is too large</value></data>
@@ -51,8 +49,6 @@
   <data name="AccessLevel.InvalidFormat.Description" xml:space="preserve"><value>Access level must be public or private.</value></data>
   <data name="MediaStatus.InvalidFormat.Title" xml:space="preserve"><value>Media status is invalid</value></data>
   <data name="MediaStatus.InvalidFormat.Description" xml:space="preserve"><value>Media status is invalid.</value></data>
-  <data name="MediaType.InvalidFormat.Title" xml:space="preserve"><value>Media type is invalid</value></data>
-  <data name="MediaType.InvalidFormat.Description" xml:space="preserve"><value>Media type is invalid.</value></data>
   <data name="OwnerType.InvalidFormat.Title" xml:space="preserve"><value>Owner type is invalid</value></data>
   <data name="OwnerType.InvalidFormat.Description" xml:space="preserve"><value>Owner type must be user, listing, identification, or verificationSubmission.</value></data>
   <data name="VariantType.InvalidFormat.Title" xml:space="preserve"><value>Variant type is invalid</value></data>

@@ -13,7 +13,9 @@ RUN --mount=type=secret,id=nuget_auth_token \
     --store-password-in-clear-text \
  && dotnet restore src/API/Media.API.csproj --force-evaluate
 COPY src/ ./src/
-RUN dotnet publish src/API/Media.API.csproj -c Release \
+RUN --mount=type=secret,id=sixlabors_license_key \
+    export SIXLABORS_LICENSE_KEY="$(cat /run/secrets/sixlabors_license_key)" \
+ && dotnet publish src/API/Media.API.csproj -c Release \
     -o /app/publish \
     -p:OpenApiGenerateDocumentsOnBuild=false \
     --no-restore

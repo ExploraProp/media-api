@@ -8,23 +8,23 @@ using SharedKernel.Kernel.Results;
 namespace Media.Application.UseCases;
 
 public sealed class RejectMediaUseCase(
-    IMediaRepo mediaRepo,
+    IMediaUploadRepo mediaUploadRepo,
     IStorageService storageService) : IRequestHandler<RejectMediaCommand, Result<bool>>
 {
     public async Task<Result<bool>> Handle(RejectMediaCommand command, CancellationToken cancellationToken)
     {
-        var mediaFileResult = await mediaRepo.GetByIdAsync(command.Id, cancellationToken);
-        if (mediaFileResult.IsFailure) return Result<bool>.FromResult(mediaFileResult);
-        var mediaFile = mediaFileResult.Value!;
+        var uploadResult = await mediaUploadRepo.GetByIdAsync(command.Id, cancellationToken);
+        if (uploadResult.IsFailure) return Result<bool>.FromResult(uploadResult);
+        var upload = uploadResult.Value!;
 
-        await storageService.DeleteFileAsync(mediaFile.QuarantinePath.Value);
+        await storageService.DeleteFileAsync(upload.QuarantinePath.Value);
 
         var reason = command.Reason.ToI18nCode();
         var transitionResult = command.Reason == ScanRejectionReason.Infected
-            ? mediaFile.Reject(reason)
-            : mediaFile.MarkFailed(reason);
+            ? upload.Reject(reason)
+            : upload.MarkFailed(reason);
         if (transitionResult.IsFailure) return Result<bool>.FromResult(transitionResult);
 
-        return await mediaRepo.UpdateAsync(mediaFile, cancellationToken);
+        return await mediaUploadRepo.UpdateAsync(upload, cancellationToken);
     }
 }

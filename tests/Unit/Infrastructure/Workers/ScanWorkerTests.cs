@@ -4,21 +4,19 @@ using Media.Domain.Enums.Properties;
 using Media.Domain.Repositories;
 using Media.Domain.Services.Interfaces;
 using Media.Domain.ValueObjects.Ids;
-using Media.Domain.ValueObjects.Properties;
 using Media.Infrastructure.Workers;
+using Media.Unit.TestSupport;
 using Microsoft.Extensions.Logging.Abstractions;
 using SharedKernel.Application.Services;
 using SharedKernel.Kernel.Results;
 using System.Threading.Channels;
-using UploadedByClientId = Media.Domain.ValueObjects.Ids.UploadedByClientId;
-using UploadMediaType = Media.Domain.Enums.Properties.MediaType;
 
 namespace Media.Unit.Infrastructure.Workers;
 
 [TestClass]
 public class ScanWorkerTests
 {
-    private readonly Mock<IMediaRepo> _mediaRepo = new();
+    private readonly Mock<IMediaUploadRepo> _mediaUploadRepo = new();
     private readonly Mock<IScanService> _scanService = new();
     private readonly Mock<IMediaScanOrchestrator> _scanOrchestrator = new();
     private readonly Mock<IStorageService> _storageService = new();
@@ -38,7 +36,7 @@ public class ScanWorkerTests
 
         _scopeFactory.Setup(f => f.CreateScope()).Returns(_scope.Object);
         _scope.Setup(s => s.ServiceProvider).Returns(_serviceProvider.Object);
-        _serviceProvider.Setup(p => p.GetService(typeof(IMediaRepo))).Returns(_mediaRepo.Object);
+        _serviceProvider.Setup(p => p.GetService(typeof(IMediaUploadRepo))).Returns(_mediaUploadRepo.Object);
         _serviceProvider.Setup(p => p.GetService(typeof(IScanService))).Returns(_scanService.Object);
         _serviceProvider.Setup(p => p.GetService(typeof(IMediaScanOrchestrator))).Returns(_scanOrchestrator.Object);
         _serviceProvider.Setup(p => p.GetService(typeof(IStorageService))).Returns(_storageService.Object);
@@ -68,28 +66,16 @@ public class ScanWorkerTests
         _scope.Object.Dispose();
     }
 
-    private MediaFile CreatePendingMediaFile(MediaFileId? id = null)
-    {
-        var fileId = id ?? MediaFileId.New();
-        return MediaFile.Create(
-            fileId,
-            OwnerId,
-            OwnerType.Listing,
-            UploadMediaType.Photo,
-            MediaStatus.Pending,
-            StoragePath.FromDatabase($"quarantine/listing/{OwnerId.Value}/{fileId.Value}.jpg"),
-            AllowedContentTypes.Jpeg,
-            MediaFileSize.FromDatabase(1024),
-            UploadedByClientId.New()).Value!;
-    }
+    private MediaUpload CreatePendingUpload(MediaFileId? id = null) =>
+        MediaTestFactory.CreateUpload(id ?? MediaFileId.New(), OwnerId);
 
-    private void SetupMediaRepo(MediaFile mediaFile)
+    private void SetupMediaUploadRepo(MediaUpload upload)
     {
-        _mediaRepo
-            .Setup(r => r.GetByIdAsync(mediaFile.Id, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result<MediaFile>.Success(mediaFile));
-        _mediaRepo
-            .Setup(r => r.UpdateAsync(It.IsAny<MediaFile>(), It.IsAny<CancellationToken>()))
+        _mediaUploadRepo
+            .Setup(r => r.GetByIdAsync(upload.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result<MediaUpload>.Success(upload));
+        _mediaUploadRepo
+            .Setup(r => r.UpdateAsync(It.IsAny<MediaUpload>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<bool>.Success(true));
     }
 
@@ -132,28 +118,28 @@ public class ScanWorkerTests
     [TestMethod]
     public async Task StartAsync_WhenFileIsClean_ShouldCallApproveAsync()
     {
-        var mediaFile = CreatePendingMediaFile();
-        SetupMediaRepo(mediaFile);
+        var upload = CreatePendingUpload();
+        SetupMediaUploadRepo(upload);
         SetupCleanScan();
 
-        await RunWorkerAndWaitAsync(mediaFile.Id);
+        await RunWorkerAndWaitAsync(upload.Id);
 
         _scanOrchestrator.Verify(
-            o => o.ApproveAsync(mediaFile.Id, It.IsAny<CancellationToken>()),
+            o => o.ApproveAsync(upload.Id, It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
     [TestMethod]
     public async Task StartAsync_WhenFileIsInfected_ShouldCallRejectWithInfectedReason()
     {
-        var mediaFile = CreatePendingMediaFile();
-        SetupMediaRepo(mediaFile);
+        var upload = CreatePendingUpload();
+        SetupMediaUploadRepo(upload);
         SetupInfectedScan();
 
-        await RunWorkerAndWaitAsync(mediaFile.Id);
+        await RunWorkerAndWaitAsync(upload.Id);
 
         _scanOrchestrator.Verify(
-            o => o.RejectAsync(mediaFile.Id, ScanRejectionReason.Infected, It.IsAny<CancellationToken>()),
+            o => o.RejectAsync(upload.Id, ScanRejectionReason.Infected, It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -161,9 +147,9 @@ public class ScanWorkerTests
     public async Task StartAsync_WhenMediaFileNotFound_ShouldNotCallOrchestrator()
     {
         var id = MediaFileId.New();
-        _mediaRepo
+        _mediaUploadRepo
             .Setup(r => r.GetByIdAsync(id, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result<MediaFile>.Failure(SharedFailures.NotFound(nameof(MediaFile))));
+            .ReturnsAsync(Result<MediaUpload>.Failure(SharedFailures.NotFound(nameof(MediaUpload))));
 
         await _worker.StartAsync(CancellationToken.None);
         await _channel.Writer.WriteAsync(id);
@@ -181,8 +167,8 @@ public class ScanWorkerTests
     [TestMethod]
     public async Task StartAsync_WhenAllScanAttemptsThrow_ShouldCallRejectWithScanFailedReason()
     {
-        var mediaFile = CreatePendingMediaFile();
-        SetupMediaRepo(mediaFile);
+        var upload = CreatePendingUpload();
+        SetupMediaUploadRepo(upload);
 
         _storageService
             .Setup(s => s.DownloadFileAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -190,7 +176,7 @@ public class ScanWorkerTests
 
         var deadline = DateTime.UtcNow.AddSeconds(5);
         await _worker.StartAsync(CancellationToken.None);
-        await _channel.Writer.WriteAsync(mediaFile.Id);
+        await _channel.Writer.WriteAsync(upload.Id);
 
         while (DateTime.UtcNow < deadline)
         {
@@ -201,33 +187,23 @@ public class ScanWorkerTests
         await _worker.StopAsync(CancellationToken.None);
 
         _scanOrchestrator.Verify(
-            o => o.RejectAsync(mediaFile.Id, ScanRejectionReason.ScanFailed, It.IsAny<CancellationToken>()),
+            o => o.RejectAsync(upload.Id, ScanRejectionReason.ScanFailed, It.IsAny<CancellationToken>()),
             Times.Once);
 
         _deadLetterStore.Verify(
-            d => d.RecordAsync(mediaFile.Id, It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            d => d.RecordAsync(upload.Id, It.IsAny<string>(), It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
     [TestMethod]
     public async Task StartAsync_WhenFileIsNotPending_ShouldNotCallOrchestrator()
     {
-        var id = MediaFileId.New();
-        var mediaFile = MediaFile.Create(
-            id,
-            OwnerId,
-            OwnerType.Listing,
-            UploadMediaType.Photo,
-            MediaStatus.Scanning,
-            StoragePath.FromDatabase($"quarantine/listing/{OwnerId.Value}/{id.Value}.jpg"),
-            AllowedContentTypes.Jpeg,
-            MediaFileSize.FromDatabase(1024),
-            UploadedByClientId.New()).Value!;
+        var upload = MediaTestFactory.CreateScanningUpload(ownerId: OwnerId);
 
-        SetupMediaRepo(mediaFile);
+        SetupMediaUploadRepo(upload);
 
         await _worker.StartAsync(CancellationToken.None);
-        await _channel.Writer.WriteAsync(id);
+        await _channel.Writer.WriteAsync(upload.Id);
         await Task.Delay(200);
         await _worker.StopAsync(CancellationToken.None);
 

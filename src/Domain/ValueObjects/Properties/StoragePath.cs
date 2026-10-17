@@ -28,8 +28,5 @@ public sealed record StoragePath
         return Result<StoragePath>.Success(new StoragePath(value));
     }
 
-    /// <summary>Parses a path produced by the quarantine upload pipeline.</summary>
-    public static Result<StoragePath> FromQuarantineUpload(string? value) => Create(value);
-
     public static StoragePath FromDatabase(string value) => new(value);
 }

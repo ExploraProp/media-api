@@ -9,6 +9,7 @@ using SharedKernel.Application.Filters;
 using SharedKernel.Infrastructure.Repositories.Base;
 using SharedKernel.Kernel.Results;
 using System.Linq.Expressions;
+
 namespace Media.Infrastructure.Repositories;
 
 public sealed class MediaRepo(MediaDbContext context, ILogger<MediaRepo> logger)
@@ -58,43 +59,6 @@ public sealed class MediaRepo(MediaDbContext context, ILogger<MediaRepo> logger)
 
     async Task<Result<bool>> IMediaRepo.DeleteAsync(MediaFileId id, CancellationToken ct) =>
         await DeleteAsync(id, ct);
-
-    public async Task<Result<IReadOnlyList<MediaFile>>> GetByStatusesAsync(IReadOnlyList<MediaStatus> statuses, CancellationToken ct)
-    {
-        try
-        {
-            var entities = await Set
-                .Include(m => m.Variants)
-                .Where(m => statuses.Contains(m.Status) && m.DeletedAt == null)
-                .ToListAsync(ct);
-            return Result<IReadOnlyList<MediaFile>>.Success(entities);
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Error getting media files by statuses");
-            return Result<IReadOnlyList<MediaFile>>.Failure(SharedFailures.SystemFailed);
-        }
-    }
-
-    public async Task<Result<IReadOnlyList<MediaFile>>> GetOrphansAsync(DateTime pendingBefore, int maxCount, CancellationToken ct)
-    {
-        try
-        {
-            var entities = await Set
-                .Include(m => m.Variants)
-                .Where(m => m.DeletedAt == null &&
-                            ((m.Status == MediaStatus.Pending && m.UploadedAt < pendingBefore) ||
-                             m.Status == MediaStatus.Failed))
-                .Take(maxCount)
-                .ToListAsync(ct);
-            return Result<IReadOnlyList<MediaFile>>.Success(entities);
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Error getting orphan media files");
-            return Result<IReadOnlyList<MediaFile>>.Failure(SharedFailures.SystemFailed);
-        }
-    }
 
     protected override Result<Expression<Func<MediaFile, object>>> GetSortProperty(string propertyName) =>
         Result<Expression<Func<MediaFile, object>>>.Failure(QueryFailures.InvalidSortProperty(propertyName));

@@ -12,7 +12,7 @@ public sealed record MediaPromotionResult(
 public interface IMediaPromotionService
 {
     Task<Result<MediaPromotionResult>> PromoteAsync(
-        MediaFile mediaFile,
+        MediaUpload upload,
         MediaPolicy policy,
         CancellationToken cancellationToken);
 }
