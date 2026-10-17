@@ -22,12 +22,23 @@ public sealed class MediaPublicUrlService(MediaDbContext context) : IMediaPublic
         var ids = mediaFileIds.Select(id => new MediaFileId(id)).ToList();
         var files = await context.Set<MediaFile>()
             .Include(m => m.Variants)
-            .Where(m => ids.Contains(m.Id) && m.Status == MediaStatus.Approved)
+            .Where(m => ids.Contains(m.Id))
             .ToListAsync(cancellationToken);
+
+        var accessByOwnerType = await context.Set<MediaPolicy>()
+            .AsNoTracking()
+            .ToDictionaryAsync(p => p.OwnerType, p => p.AccessLevel, cancellationToken);
 
         return files.ToDictionary(
             f => f.Id.Value,
-            f => f.Variants.FirstOrDefault(v => v.VariantType == VariantType.Large)?.Url.Value
-                ?? f.PublicUrl?.Value);
+            f =>
+            {
+                if (!accessByOwnerType.TryGetValue(f.OwnerType, out var accessLevel) ||
+                    accessLevel != AccessLevel.Public)
+                    return null;
+
+                return f.Variants.FirstOrDefault(v => v.VariantType == VariantType.Large)?.Url.Value
+                    ?? f.ResolvePublicUrl(accessLevel);
+            });
     }
 }

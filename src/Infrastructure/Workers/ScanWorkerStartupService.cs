@@ -16,22 +16,22 @@ public sealed class ScanWorkerStartupService(
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         using var scope = scopeFactory.CreateScope();
-        var mediaRepo = scope.ServiceProvider.GetRequiredService<IMediaRepo>();
+        var mediaUploadRepo = scope.ServiceProvider.GetRequiredService<IMediaUploadRepo>();
 
-        var result = await mediaRepo.GetByStatusesAsync(
+        var result = await mediaUploadRepo.GetByStatusesAsync(
             [MediaStatus.Pending, MediaStatus.Scanning],
             cancellationToken);
 
         if (result.IsFailure)
         {
-            logger.LogError("Failed to load pending/scanning media files on startup: {Error}", result.Error?.Code.Value);
+            logger.LogError("Failed to load pending/scanning media uploads on startup: {Error}", result.Error?.Code.Value);
             return;
         }
 
-        foreach (var mediaFile in result.Value!)
+        foreach (var upload in result.Value!)
         {
-            await channel.Writer.WriteAsync(mediaFile.Id, cancellationToken);
-            logger.LogInformation("Re-enqueued {MediaFileId} for scanning on startup", mediaFile.Id);
+            await channel.Writer.WriteAsync(upload.Id, cancellationToken);
+            logger.LogInformation("Re-enqueued {MediaFileId} for scanning on startup", upload.Id);
         }
     }
 

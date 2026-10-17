@@ -50,11 +50,11 @@ public sealed class OrphanCleanupService(
     internal async Task CleanupAsync(CancellationToken ct)
     {
         using var scope = scopeFactory.CreateScope();
-        var mediaRepo = scope.ServiceProvider.GetRequiredService<IMediaRepo>();
+        var mediaUploadRepo = scope.ServiceProvider.GetRequiredService<IMediaUploadRepo>();
         var storageService = scope.ServiceProvider.GetRequiredService<IStorageService>();
 
         var pendingBefore = DateTime.UtcNow.AddHours(-ttlHours);
-        var orphansResult = await mediaRepo.GetOrphansAsync(pendingBefore, MaxOrphansPerRun, ct);
+        var orphansResult = await mediaUploadRepo.GetOrphansAsync(pendingBefore, MaxOrphansPerRun, ct);
         if (orphansResult.IsFailure)
         {
             logger.LogError("Failed to retrieve orphans: {Error}", orphansResult.Error?.Code.Value);
@@ -66,46 +66,31 @@ public sealed class OrphanCleanupService(
             return;
 
         var cleaned = 0;
-        foreach (var mediaFile in orphans)
+        foreach (var upload in orphans)
         {
-            var deleteReadyResult = mediaFile.Delete();
+            var deleteReadyResult = upload.Delete();
             if (deleteReadyResult.IsFailure)
             {
                 logger.LogWarning("Cannot mark orphan {MediaFileId} for deletion: {Error}",
-                    mediaFile.Id, deleteReadyResult.Error?.Code.Value);
+                    upload.Id, deleteReadyResult.Error?.Code.Value);
                 continue;
-            }
-
-            foreach (var variant in mediaFile.Variants)
-            {
-                try
-                {
-                    if (variant.Url.Value.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
-                        await storageService.DeleteFileByUrlAsync(variant.Url.Value);
-                    else
-                        await storageService.DeleteFileAsync(variant.Url.Value);
-                }
-                catch (Exception ex)
-                {
-                    logger.LogWarning(ex, "Failed to delete variant blob {Url}; continuing", variant.Url.Value);
-                }
             }
 
             try
             {
-                await storageService.DeleteFileAsync(mediaFile.QuarantinePath.Value);
+                await storageService.DeleteFileAsync(upload.QuarantinePath.Value);
             }
             catch (Exception ex)
             {
                 logger.LogWarning(ex, "Failed to delete quarantine blob {Path}; continuing",
-                    mediaFile.QuarantinePath.Value);
+                    upload.QuarantinePath.Value);
             }
 
-            var dbDeleteResult = await mediaRepo.DeleteAsync(mediaFile.Id, ct);
+            var dbDeleteResult = await mediaUploadRepo.DeleteAsync(upload.Id, ct);
             if (dbDeleteResult.IsFailure)
             {
                 logger.LogError("Failed to delete orphan DB record {MediaFileId}: {Error}",
-                    mediaFile.Id, dbDeleteResult.Error?.Code.Value);
+                    upload.Id, dbDeleteResult.Error?.Code.Value);
                 continue;
             }
 
