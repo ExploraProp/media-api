@@ -13,7 +13,6 @@ public sealed record UploadMediaCommand(
     OwnerType OwnerType,
     OwnerId OwnerId,
     MediaFileId MediaFileId,
-    MediaType MediaType,
     IFormFile File,
     MediaFileSize MediaFileSize,
     UploadedByClientId UploadedByClientUserId
@@ -24,13 +23,11 @@ public sealed record UploadMediaCommand(
         var ownerTypeResult = OwnerTypeExtensions.TryParseOwnerType(dto.OwnerType);
         var ownerIdResult = OwnerId.Create(dto.OwnerId);
         var mediaFileIdResult = MediaFileId.New();
-        var mediaTypeResult = MediaTypeExtensions.TryParseMediaType(dto.MediaType);
         var mediaFileSizeResult = MediaFileSize.Create(dto.File.Length);
 
         var fieldErrors = new List<Error>();
         if (ownerTypeResult.IsFailure) fieldErrors.AddRange(ownerTypeResult.Errors);
         if (ownerIdResult.IsFailure) fieldErrors.AddRange(ownerIdResult.Errors);
-        if (mediaTypeResult.IsFailure) fieldErrors.AddRange(mediaTypeResult.Errors);
         if (mediaFileSizeResult.IsFailure) fieldErrors.AddRange(mediaFileSizeResult.Errors);
 
         if (fieldErrors.Count > 0)
@@ -40,7 +37,6 @@ public sealed record UploadMediaCommand(
             ownerTypeResult.Value!,
             ownerIdResult.Value!,
             mediaFileIdResult!,
-            mediaTypeResult.Value!,
             dto.File,
             mediaFileSizeResult.Value!,
             uploadedByClientUserId

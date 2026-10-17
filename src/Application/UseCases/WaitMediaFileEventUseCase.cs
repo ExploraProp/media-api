@@ -12,6 +12,8 @@ namespace Media.Application.UseCases;
 
 public sealed class WaitMediaFileEventUseCase(
     IMediaRepo mediaRepo,
+    IMediaUploadRepo mediaUploadRepo,
+    IMediaPolicyRepo mediaPolicyRepo,
     IMediaEventAccessService mediaEventAccessService,
     IMediaEventWaitService mediaEventWaitService)
     : IRequestHandler<WaitMediaFileEventQuery, Result<MediaFileEventWaitDto>>
@@ -20,23 +22,24 @@ public sealed class WaitMediaFileEventUseCase(
         WaitMediaFileEventQuery request,
         CancellationToken cancellationToken)
     {
-        var mediaFileResult = await mediaRepo.GetByIdAsync(request.MediaFileId, cancellationToken);
-        if (mediaFileResult.IsFailure)
-            return Result<MediaFileEventWaitDto>.FromResult(mediaFileResult);
-
-        var mediaFile = mediaFileResult.Value!;
-
-        var accessResult = await mediaEventAccessService.CanAccessEventsAsync(
-            mediaFile,
-            request.RequestingUserId,
-            request.RequestingClientUserId,
-            cancellationToken);
-        if (accessResult.IsFailure)
-            return Result<MediaFileEventWaitDto>.FromResult(accessResult);
-
-        // If file is already in a terminal state, return a synthetic event immediately
-        if (mediaFile.Status == MediaStatus.Approved)
+        var readyResult = await mediaRepo.GetByIdAsync(request.MediaFileId, cancellationToken);
+        if (readyResult.IsSuccess)
         {
+            var mediaFile = readyResult.Value!;
+            var accessResult = await mediaEventAccessService.CanAccessEventsAsync(
+                mediaFile.OwnerId,
+                mediaFile.OwnerType,
+                request.RequestingUserId,
+                request.RequestingClientUserId,
+                cancellationToken);
+            if (accessResult.IsFailure)
+                return Result<MediaFileEventWaitDto>.FromResult(accessResult);
+
+            var policyResult = await mediaPolicyRepo.GetByOwnerTypeAsync(mediaFile.OwnerType, cancellationToken);
+            if (policyResult.IsFailure)
+                return Result<MediaFileEventWaitDto>.FromResult(policyResult);
+
+            var accessLevel = policyResult.Value!.AccessLevel;
             var eventVariants = mediaFile.Variants
                 .Select(v => new MediaVariantSnapshot(v.VariantType.ToI18nCode(), v.Url.Value))
                 .ToList();
@@ -44,21 +47,35 @@ public sealed class WaitMediaFileEventUseCase(
             var syntheticApprovedEvent = new MediaFileEvent(
                 "fileApproved",
                 new FileApproved(
-                    mediaFile.PublicUrl?.Value,
+                    mediaFile.ResolvePublicUrl(accessLevel),
                     mediaFile.OwnerId,
                     mediaFile.OwnerType,
-                    mediaFile.AccessLevel,
+                    accessLevel,
                     eventVariants,
                     mediaFile.Id));
 
             return Result<MediaFileEventWaitDto>.Success(new MediaFileEventWaitDto(syntheticApprovedEvent, false));
         }
 
-        if (mediaFile.Status is MediaStatus.Rejected or MediaStatus.Failed)
+        var uploadResult = await mediaUploadRepo.GetByIdAsync(request.MediaFileId, cancellationToken);
+        if (uploadResult.IsFailure)
+            return Result<MediaFileEventWaitDto>.FromResult(uploadResult);
+
+        var upload = uploadResult.Value!;
+        var uploadAccessResult = await mediaEventAccessService.CanAccessEventsAsync(
+            upload.OwnerId,
+            upload.OwnerType,
+            request.RequestingUserId,
+            request.RequestingClientUserId,
+            cancellationToken);
+        if (uploadAccessResult.IsFailure)
+            return Result<MediaFileEventWaitDto>.FromResult(uploadAccessResult);
+
+        if (upload.Status is MediaStatus.Rejected or MediaStatus.Failed)
         {
             var syntheticRejectedEvent = new MediaFileEvent(
                 "fileRejected",
-                new FileRejected(mediaFile.OwnerId, mediaFile.OwnerType, "completed", mediaFile.Id));
+                new FileRejected(upload.OwnerId, upload.OwnerType, "completed", upload.Id));
 
             return Result<MediaFileEventWaitDto>.Success(new MediaFileEventWaitDto(syntheticRejectedEvent, false));
         }

@@ -10,11 +10,6 @@
   <data name="identification" xml:space="preserve"><value>Identificacion</value></data>
   <data name="verificationSubmission" xml:space="preserve"><value>Envio de verificacion</value></data>
 
-  <data name="photo" xml:space="preserve"><value>Foto</value></data>
-  <data name="floorPlan" xml:space="preserve"><value>Plano</value></data>
-  <data name="virtualTour" xml:space="preserve"><value>Tour virtual</value></data>
-  <data name="document" xml:space="preserve"><value>Documento</value></data>
-
   <data name="public" xml:space="preserve"><value>Publico</value></data>
   <data name="private" xml:space="preserve"><value>Privado</value></data>
 
