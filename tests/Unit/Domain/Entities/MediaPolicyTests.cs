@@ -48,19 +48,14 @@ public class MediaPolicyTests
         Assert.AreEqual(AllowedContentTypes.Jpeg, result.Value);
     }
 
-    [TestMethod]
-    public void ValidateContentType_WhenUnknown_ShouldReturnUnsupportedContentType()
+    [DataTestMethod]
+    [DataRow(null, AllowedContentTypes.Jpeg | AllowedContentTypes.Png)]
+    [DataRow(AllowedContentTypes.Pdf, AllowedContentTypes.Jpeg)]
+    public void ValidateContentType_WhenNotAllowed_ShouldReturnUnsupportedContentType(
+        AllowedContentTypes? contentType,
+        AllowedContentTypes allowedContentTypes)
     {
-        var result = CreatePolicy().ValidateContentType(null);
-
-        Assert.IsTrue(result.IsFailure);
-        Assert.AreEqual(MediaPolicyError.UnsupportedContentType, result.Error!);
-    }
-
-    [TestMethod]
-    public void ValidateContentType_WhenNotInPolicy_ShouldReturnUnsupportedContentType()
-    {
-        var result = CreatePolicy(allowedContentTypes: AllowedContentTypes.Jpeg).ValidateContentType(AllowedContentTypes.Pdf);
+        var result = CreatePolicy(allowedContentTypes: allowedContentTypes).ValidateContentType(contentType);
 
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(MediaPolicyError.UnsupportedContentType, result.Error!);

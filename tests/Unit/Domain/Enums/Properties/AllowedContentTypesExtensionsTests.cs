@@ -5,120 +5,69 @@ namespace Media.Unit.Domain.Enums.Properties;
 [TestClass]
 public class AllowedContentTypesExtensionsTests
 {
-    [TestMethod]
-    public void FromMagicBytes_WithJpegHeader_ShouldReturnJpeg()
+    [DataTestMethod]
+    [DataRow("FFD8FFE0", AllowedContentTypes.Jpeg)]
+    [DataRow("89504E470D0A", AllowedContentTypes.Png)]
+    [DataRow("474946383961", AllowedContentTypes.Gif)]
+    [DataRow("524946460000000057454250", AllowedContentTypes.WebP)]
+    [DataRow("255044462D", AllowedContentTypes.Pdf)]
+    public void FromMagicBytes_KnownHeader_ReturnsType(string hexHeader, AllowedContentTypes expected)
     {
-        ReadOnlySpan<byte> header = [0xFF, 0xD8, 0xFF, 0xE0];
+        ReadOnlySpan<byte> header = Convert.FromHexString(hexHeader);
 
-        Assert.AreEqual(AllowedContentTypes.Jpeg, AllowedContentTypesExtensions.FromMagicBytes(header));
+        Assert.AreEqual(expected, AllowedContentTypesExtensions.FromMagicBytes(header));
     }
 
-    [TestMethod]
-    public void FromMagicBytes_WithPngHeader_ShouldReturnPng()
+    [DataTestMethod]
+    [DataRow("4D5A9000")]
+    [DataRow("FFD8")]
+    public void FromMagicBytes_UnrecognizedOrTooShort_ReturnsNull(string hexHeader)
     {
-        ReadOnlySpan<byte> header = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A];
-
-        Assert.AreEqual(AllowedContentTypes.Png, AllowedContentTypesExtensions.FromMagicBytes(header));
-    }
-
-    [TestMethod]
-    public void FromMagicBytes_WithGifHeader_ShouldReturnGif()
-    {
-        ReadOnlySpan<byte> header = [0x47, 0x49, 0x46, 0x38, 0x39, 0x61];
-
-        Assert.AreEqual(AllowedContentTypes.Gif, AllowedContentTypesExtensions.FromMagicBytes(header));
-    }
-
-    [TestMethod]
-    public void FromMagicBytes_WithWebPHeader_ShouldReturnWebP()
-    {
-        ReadOnlySpan<byte> header =
-        [
-            0x52, 0x49, 0x46, 0x46, 0x00, 0x00, 0x00, 0x00,
-            0x57, 0x45, 0x42, 0x50,
-        ];
-
-        Assert.AreEqual(AllowedContentTypes.WebP, AllowedContentTypesExtensions.FromMagicBytes(header));
-    }
-
-    [TestMethod]
-    public void FromMagicBytes_WithPdfHeader_ShouldReturnPdf()
-    {
-        ReadOnlySpan<byte> header = [0x25, 0x50, 0x44, 0x46, 0x2D];
-
-        Assert.AreEqual(AllowedContentTypes.Pdf, AllowedContentTypesExtensions.FromMagicBytes(header));
-    }
-
-    [TestMethod]
-    public void FromMagicBytes_WithUnknownHeader_ShouldReturnNull()
-    {
-        ReadOnlySpan<byte> header = [0x4D, 0x5A, 0x90, 0x00];
+        ReadOnlySpan<byte> header = Convert.FromHexString(hexHeader);
 
         Assert.IsNull(AllowedContentTypesExtensions.FromMagicBytes(header));
     }
 
-    [TestMethod]
-    public void FromMagicBytes_WithTooShortHeader_ShouldReturnNull()
+    [DataTestMethod]
+    [DataRow(AllowedContentTypes.Jpeg, AllowedContentTypes.Jpeg | AllowedContentTypes.Png, true)]
+    [DataRow(AllowedContentTypes.Pdf, AllowedContentTypes.Jpeg | AllowedContentTypes.Png, false)]
+    [DataRow(AllowedContentTypes.None, AllowedContentTypes.Jpeg, false)]
+    public void IsAllowed_ReturnsExpected(
+        AllowedContentTypes detected, AllowedContentTypes policy, bool expected)
     {
-        ReadOnlySpan<byte> header = [0xFF, 0xD8];
-
-        Assert.IsNull(AllowedContentTypesExtensions.FromMagicBytes(header));
+        Assert.AreEqual(expected, detected.IsAllowed(policy));
     }
 
-    [TestMethod]
-    public void IsAllowed_WhenDetectedTypeIsInPolicy_ShouldReturnTrue()
+    [DataTestMethod]
+    [DataRow(AllowedContentTypes.Gif, AllowedContentTypes.Jpeg, true)]
+    [DataRow(AllowedContentTypes.Jpeg, AllowedContentTypes.Jpeg, false)]
+    public void IsNotAllowed_NegatesIsAllowed(
+        AllowedContentTypes detected, AllowedContentTypes policy, bool expected)
     {
-        Assert.IsTrue(AllowedContentTypes.Jpeg.IsAllowed(AllowedContentTypes.Jpeg | AllowedContentTypes.Png));
+        Assert.AreEqual(expected, detected.IsNotAllowed(policy));
     }
 
-    [TestMethod]
-    public void IsAllowed_WhenDetectedTypeIsNotInPolicy_ShouldReturnFalse()
+    [DataTestMethod]
+    [DataRow(AllowedContentTypes.Jpeg, "image/jpeg")]
+    [DataRow(AllowedContentTypes.Png, "image/png")]
+    [DataRow(AllowedContentTypes.Gif, "image/gif")]
+    [DataRow(AllowedContentTypes.WebP, "image/webp")]
+    [DataRow(AllowedContentTypes.Pdf, "application/pdf")]
+    [DataRow(AllowedContentTypes.None, "application/octet-stream")]
+    public void ToMimeType_MapsKnownTypes(AllowedContentTypes contentType, string expected)
     {
-        Assert.IsFalse(AllowedContentTypes.Pdf.IsAllowed(AllowedContentTypes.Jpeg | AllowedContentTypes.Png));
+        Assert.AreEqual(expected, contentType.ToMimeType());
     }
 
-    [TestMethod]
-    public void IsAllowed_WhenDetectedTypeIsNone_ShouldReturnFalse()
+    [DataTestMethod]
+    [DataRow(AllowedContentTypes.Jpeg, ".jpg")]
+    [DataRow(AllowedContentTypes.Png, ".png")]
+    [DataRow(AllowedContentTypes.Gif, ".gif")]
+    [DataRow(AllowedContentTypes.WebP, ".webp")]
+    [DataRow(AllowedContentTypes.Pdf, ".pdf")]
+    [DataRow(AllowedContentTypes.None, "")]
+    public void ToFileExtension_MapsKnownTypes(AllowedContentTypes contentType, string expected)
     {
-        Assert.IsFalse(AllowedContentTypes.None.IsAllowed(AllowedContentTypes.Jpeg));
-    }
-
-    [TestMethod]
-    public void IsNotAllowed_ShouldNegateIsAllowed()
-    {
-        Assert.IsTrue(AllowedContentTypes.Gif.IsNotAllowed(AllowedContentTypes.Jpeg));
-        Assert.IsFalse(AllowedContentTypes.Jpeg.IsNotAllowed(AllowedContentTypes.Jpeg));
-    }
-
-    [TestMethod]
-    public void ToMimeType_ShouldMapKnownTypes()
-    {
-        Assert.AreEqual("image/jpeg", AllowedContentTypes.Jpeg.ToMimeType());
-        Assert.AreEqual("image/png", AllowedContentTypes.Png.ToMimeType());
-        Assert.AreEqual("image/gif", AllowedContentTypes.Gif.ToMimeType());
-        Assert.AreEqual("image/webp", AllowedContentTypes.WebP.ToMimeType());
-        Assert.AreEqual("application/pdf", AllowedContentTypes.Pdf.ToMimeType());
-    }
-
-    [TestMethod]
-    public void ToMimeType_WithNone_ShouldReturnOctetStream()
-    {
-        Assert.AreEqual("application/octet-stream", AllowedContentTypes.None.ToMimeType());
-    }
-
-    [TestMethod]
-    public void ToFileExtension_ShouldMapKnownTypes()
-    {
-        Assert.AreEqual(".jpg", AllowedContentTypes.Jpeg.ToFileExtension());
-        Assert.AreEqual(".png", AllowedContentTypes.Png.ToFileExtension());
-        Assert.AreEqual(".gif", AllowedContentTypes.Gif.ToFileExtension());
-        Assert.AreEqual(".webp", AllowedContentTypes.WebP.ToFileExtension());
-        Assert.AreEqual(".pdf", AllowedContentTypes.Pdf.ToFileExtension());
-    }
-
-    [TestMethod]
-    public void ToFileExtension_WithNone_ShouldReturnEmpty()
-    {
-        Assert.AreEqual(string.Empty, AllowedContentTypes.None.ToFileExtension());
+        Assert.AreEqual(expected, contentType.ToFileExtension());
     }
 }
