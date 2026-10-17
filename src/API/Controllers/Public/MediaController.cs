@@ -17,8 +17,8 @@ public class MediaController(IMediator mediator) : PublicApiController
     [ProducesResponseType(typeof(MediaFileDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    [RequestSizeLimit(16 * 1024 * 1024)]
-    [RequestFormLimits(MultipartBodyLengthLimit = 16 * 1024 * 1024)]
+    [RequestSizeLimit(20 * 1024 * 1024)]
+    [RequestFormLimits(MultipartBodyLengthLimit = 20 * 1024 * 1024)]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> Upload([FromForm] UploadMediaDto dto, CancellationToken cancellationToken)
     {
