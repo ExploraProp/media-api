@@ -5,18 +5,16 @@ using Media.Domain.Enums.Properties;
 using Media.Domain.Events;
 using Media.Domain.Repositories;
 using Media.Domain.ValueObjects.Ids;
-using Media.Domain.ValueObjects.Properties;
+using Media.Unit.TestSupport;
 using SharedKernel.Application.Services;
 using SharedKernel.Kernel.Results;
-using UploadedByClientId = Media.Domain.ValueObjects.Ids.UploadedByClientId;
-using UploadMediaType = Media.Domain.Enums.Properties.MediaType;
 
 namespace Media.Unit.Application.UseCases;
 
 [TestClass]
 public class RejectMediaUseCaseTests
 {
-    private readonly Mock<IMediaRepo> _mediaRepo = new();
+    private readonly Mock<IMediaUploadRepo> _mediaUploadRepo = new();
     private readonly Mock<IStorageService> _storageService = new();
     private RejectMediaUseCase _useCase = null!;
 
@@ -26,91 +24,81 @@ public class RejectMediaUseCaseTests
     public void Setup()
     {
         _useCase = new RejectMediaUseCase(
-            _mediaRepo.Object,
+            _mediaUploadRepo.Object,
             _storageService.Object);
 
         _storageService
             .Setup(s => s.DeleteFileAsync(It.IsAny<string>()))
             .Returns(Task.CompletedTask);
 
-        _mediaRepo
-            .Setup(r => r.UpdateAsync(It.IsAny<MediaFile>(), It.IsAny<CancellationToken>()))
+        _mediaUploadRepo
+            .Setup(r => r.UpdateAsync(It.IsAny<MediaUpload>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<bool>.Success(true));
     }
 
-    private static MediaFile CreateScanningMediaFile()
+    private static MediaUpload CreateScanningUpload()
     {
-        var id = MediaFileId.New();
-        var mediaFile = MediaFile.Create(
-            id,
-            OwnerId,
-            OwnerType.Listing,
-            UploadMediaType.Photo,
-            MediaStatus.Pending,
-            StoragePath.FromDatabase($"quarantine/listing/{OwnerId.Value}/{id.Value}.jpg"),
-            AllowedContentTypes.Jpeg,
-            MediaFileSize.FromDatabase(1024),
-            UploadedByClientId.New()).Value!;
-        mediaFile.BeginScan();
-        return mediaFile;
+        var upload = MediaTestFactory.CreateUpload(ownerId: OwnerId);
+        upload.BeginScan();
+        return upload;
     }
 
     [TestMethod]
     public async Task Handle_WhenMediaFileNotFound_ShouldPropagateNotFound()
     {
-        _mediaRepo
+        _mediaUploadRepo
             .Setup(r => r.GetByIdAsync(It.IsAny<MediaFileId>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result<MediaFile>.Failure(SharedFailures.NotFound(nameof(MediaFile))));
+            .ReturnsAsync(Result<MediaUpload>.Failure(SharedFailures.NotFound(nameof(MediaUpload))));
 
         var result = await _useCase.Handle(
             new RejectMediaCommand(MediaFileId.New(), ScanRejectionReason.Infected),
             CancellationToken.None);
 
         Assert.IsTrue(result.IsFailure);
-        Assert.AreEqual(SharedFailures.NotFound(nameof(MediaFile)).Code.Value, result.Error!.Code.Value);
+        Assert.AreEqual(SharedFailures.NotFound(nameof(MediaUpload)).Code.Value, result.Error!.Code.Value);
     }
 
     [TestMethod]
     public async Task Handle_WhenReasonIsInfected_ShouldSetStatusToRejected()
     {
-        var mediaFile = CreateScanningMediaFile();
-        _mediaRepo
+        var upload = CreateScanningUpload();
+        _mediaUploadRepo
             .Setup(r => r.GetByIdAsync(It.IsAny<MediaFileId>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result<MediaFile>.Success(mediaFile));
+            .ReturnsAsync(Result<MediaUpload>.Success(upload));
 
         await _useCase.Handle(
-            new RejectMediaCommand(mediaFile.Id, ScanRejectionReason.Infected),
+            new RejectMediaCommand(upload.Id, ScanRejectionReason.Infected),
             CancellationToken.None);
 
-        Assert.AreEqual(MediaStatus.Rejected, mediaFile.Status);
+        Assert.AreEqual(MediaStatus.Rejected, upload.Status);
     }
 
     [TestMethod]
     public async Task Handle_WhenReasonIsScanFailed_ShouldSetStatusToFailed()
     {
-        var mediaFile = CreateScanningMediaFile();
-        _mediaRepo
+        var upload = CreateScanningUpload();
+        _mediaUploadRepo
             .Setup(r => r.GetByIdAsync(It.IsAny<MediaFileId>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result<MediaFile>.Success(mediaFile));
+            .ReturnsAsync(Result<MediaUpload>.Success(upload));
 
         await _useCase.Handle(
-            new RejectMediaCommand(mediaFile.Id, ScanRejectionReason.ScanFailed),
+            new RejectMediaCommand(upload.Id, ScanRejectionReason.ScanFailed),
             CancellationToken.None);
 
-        Assert.AreEqual(MediaStatus.Failed, mediaFile.Status);
+        Assert.AreEqual(MediaStatus.Failed, upload.Status);
     }
 
     [TestMethod]
     public async Task Handle_WithAnyReason_ShouldDeleteQuarantineFile()
     {
-        var mediaFile = CreateScanningMediaFile();
-        var expectedPath = mediaFile.QuarantinePath.Value;
-        _mediaRepo
+        var upload = CreateScanningUpload();
+        var expectedPath = upload.QuarantinePath.Value;
+        _mediaUploadRepo
             .Setup(r => r.GetByIdAsync(It.IsAny<MediaFileId>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result<MediaFile>.Success(mediaFile));
+            .ReturnsAsync(Result<MediaUpload>.Success(upload));
 
         await _useCase.Handle(
-            new RejectMediaCommand(mediaFile.Id, ScanRejectionReason.Infected),
+            new RejectMediaCommand(upload.Id, ScanRejectionReason.Infected),
             CancellationToken.None);
 
         _storageService.Verify(s => s.DeleteFileAsync(expectedPath), Times.Once);
@@ -119,48 +107,48 @@ public class RejectMediaUseCaseTests
     [TestMethod]
     public async Task Handle_WithAnyReason_ShouldCallUpdateAsync()
     {
-        var mediaFile = CreateScanningMediaFile();
-        _mediaRepo
+        var upload = CreateScanningUpload();
+        _mediaUploadRepo
             .Setup(r => r.GetByIdAsync(It.IsAny<MediaFileId>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result<MediaFile>.Success(mediaFile));
+            .ReturnsAsync(Result<MediaUpload>.Success(upload));
 
         var result = await _useCase.Handle(
-            new RejectMediaCommand(mediaFile.Id, ScanRejectionReason.ScanFailed),
+            new RejectMediaCommand(upload.Id, ScanRejectionReason.ScanFailed),
             CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        _mediaRepo.Verify(r => r.UpdateAsync(mediaFile, It.IsAny<CancellationToken>()), Times.Once);
+        _mediaUploadRepo.Verify(r => r.UpdateAsync(upload, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [TestMethod]
     public async Task Handle_WithAnyReason_ShouldRaiseFileRejectedDomainEvent()
     {
-        var mediaFile = CreateScanningMediaFile();
-        _mediaRepo
+        var upload = CreateScanningUpload();
+        _mediaUploadRepo
             .Setup(r => r.GetByIdAsync(It.IsAny<MediaFileId>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result<MediaFile>.Success(mediaFile));
+            .ReturnsAsync(Result<MediaUpload>.Success(upload));
 
         await _useCase.Handle(
-            new RejectMediaCommand(mediaFile.Id, ScanRejectionReason.Infected),
+            new RejectMediaCommand(upload.Id, ScanRejectionReason.Infected),
             CancellationToken.None);
 
-        Assert.AreEqual(1, mediaFile.DomainEvents.Count);
-        Assert.IsInstanceOfType<FileRejected>(mediaFile.DomainEvents.First());
+        Assert.AreEqual(1, upload.DomainEvents.Count);
+        Assert.IsInstanceOfType<FileRejected>(upload.DomainEvents.First());
     }
 
     [TestMethod]
     public async Task Handle_WhenUpdateFails_ShouldPropagateError()
     {
-        var mediaFile = CreateScanningMediaFile();
-        _mediaRepo
+        var upload = CreateScanningUpload();
+        _mediaUploadRepo
             .Setup(r => r.GetByIdAsync(It.IsAny<MediaFileId>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result<MediaFile>.Success(mediaFile));
-        _mediaRepo
-            .Setup(r => r.UpdateAsync(It.IsAny<MediaFile>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result<MediaUpload>.Success(upload));
+        _mediaUploadRepo
+            .Setup(r => r.UpdateAsync(It.IsAny<MediaUpload>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<bool>.Failure(SharedFailures.SystemFailed));
 
         var result = await _useCase.Handle(
-            new RejectMediaCommand(mediaFile.Id, ScanRejectionReason.Infected),
+            new RejectMediaCommand(upload.Id, ScanRejectionReason.Infected),
             CancellationToken.None);
 
         Assert.IsTrue(result.IsFailure);

@@ -1,5 +1,6 @@
 using Media.Application.Services.Interfaces;
 using Media.Domain.Entities.Definitions;
+using Media.Unit.TestSupport;
 using Media.Domain.Enums.Properties;
 using Media.Domain.Services.Errors;
 using Media.Domain.ValueObjects.Ids;
@@ -9,8 +10,6 @@ using SharedKernel.Application.Services;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using UploadedByClientId = Media.Domain.ValueObjects.Ids.UploadedByClientId;
-using UploadMediaType = Media.Domain.Enums.Properties.MediaType;
-
 namespace Media.Unit.Infrastructure.Services;
 
 [TestClass]
@@ -29,17 +28,8 @@ public class MediaPromotionServiceTests
         _service = new MediaPromotionService(_storageService.Object, _imageProcessingService.Object);
     }
 
-    private static MediaFile CreateMediaFile() =>
-        MediaFile.Create(
-            MediaFileId,
-            OwnerId,
-            OwnerType.Listing,
-            UploadMediaType.Photo,
-            MediaStatus.Scanning,
-            StoragePath.FromDatabase($"quarantine/listing/{OwnerId.Value}/{Guid.NewGuid()}.jpg"),
-            AllowedContentTypes.Jpeg,
-            MediaFileSize.FromDatabase(1024),
-            UploadedByClientId.New()).Value!;
+    private static MediaUpload CreateScanningUpload() =>
+        MediaTestFactory.CreateScanningUpload(MediaFileId, OwnerId);
 
     private static MediaPolicy CreateListingPolicy(
         bool watermarkEnabled = true,
@@ -97,7 +87,7 @@ public class MediaPromotionServiceTests
     {
         SetupHappyPath();
 
-        var result = await _service.PromoteAsync(CreateMediaFile(), CreateListingPolicy(), CancellationToken.None);
+        var result = await _service.PromoteAsync(CreateScanningUpload(), CreateListingPolicy(), CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(4, result.Value!.Variants.Count);
@@ -125,7 +115,7 @@ public class MediaPromotionServiceTests
             .ReturnsAsync(Result<IReadOnlyList<ProcessedVariant>>.Failure(
                 ImageProcessingServiceError.Processing));
 
-        var result = await _service.PromoteAsync(CreateMediaFile(), CreateListingPolicy(), CancellationToken.None);
+        var result = await _service.PromoteAsync(CreateScanningUpload(), CreateListingPolicy(), CancellationToken.None);
 
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ImageProcessingServiceError.Processing.Code.Value, result.Error!.Code.Value);
@@ -164,7 +154,7 @@ public class MediaPromotionServiceTests
             .Setup(s => s.DeleteFileByUrlAsync(It.IsAny<string>()))
             .ReturnsAsync(Result<bool>.Success(true));
 
-        var result = await _service.PromoteAsync(CreateMediaFile(), CreateListingPolicy(), CancellationToken.None);
+        var result = await _service.PromoteAsync(CreateScanningUpload(), CreateListingPolicy(), CancellationToken.None);
 
         Assert.IsTrue(result.IsFailure);
         _storageService.Verify(
@@ -178,7 +168,7 @@ public class MediaPromotionServiceTests
         SetupHappyPath();
 
         await _service.PromoteAsync(
-            CreateMediaFile(),
+            CreateScanningUpload(),
             CreateListingPolicy(watermarkEnabled: true, accessLevel: AccessLevel.Public),
             CancellationToken.None);
 
@@ -193,7 +183,7 @@ public class MediaPromotionServiceTests
         SetupHappyPath();
 
         await _service.PromoteAsync(
-            CreateMediaFile(),
+            CreateScanningUpload(),
             CreateListingPolicy(watermarkEnabled: false, accessLevel: AccessLevel.Public),
             CancellationToken.None);
 
@@ -208,7 +198,7 @@ public class MediaPromotionServiceTests
         SetupHappyPath();
 
         var result = await _service.PromoteAsync(
-            CreateMediaFile(),
+            CreateScanningUpload(),
             CreateListingPolicy(watermarkEnabled: true, accessLevel: AccessLevel.Private),
             CancellationToken.None);
 

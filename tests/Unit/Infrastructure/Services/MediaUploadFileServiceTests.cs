@@ -5,6 +5,8 @@ using Media.Domain.Enums.Properties;
 using Media.Domain.ValueObjects.Ids;
 using Media.Domain.ValueObjects.Properties;
 using Media.Infrastructure.Services;
+using SharedKernel.Application.Services;
+using SharedKernel.Kernel.Results;
 
 namespace Media.Unit.Infrastructure.Services;
 
@@ -12,11 +14,12 @@ namespace Media.Unit.Infrastructure.Services;
 public class MediaUploadFileServiceTests
 {
     private readonly Mock<IContentTypeDetectionService> _contentTypeDetectionService = new();
+    private readonly Mock<IStorageService> _storageService = new();
     private MediaUploadFileService _service = null!;
 
     [TestInitialize]
     public void Setup() =>
-        _service = new MediaUploadFileService(_contentTypeDetectionService.Object);
+        _service = new MediaUploadFileService(_contentTypeDetectionService.Object, _storageService.Object);
 
     private static MediaPolicy CreatePolicy() =>
         MediaPolicy.Create(
@@ -78,5 +81,65 @@ public class MediaUploadFileServiceTests
 
         Assert.AreEqual(AllowedContentTypes.Jpeg, prepared.ContentType);
         Assert.IsTrue(prepared.Stream.CanRead);
+    }
+
+    [TestMethod]
+    public async Task UploadToQuarantineAsync_WhenStorageSucceeds_ReturnsStoragePath()
+    {
+        var ownerId = Guid.NewGuid();
+        var mediaFileId = Guid.NewGuid();
+        var path = $"quarantine/listing/{ownerId}/{mediaFileId}.jpg";
+        _storageService
+            .Setup(s => s.UploadToQuarantineAsync(
+                It.IsAny<Stream>(),
+                "photo.jpg",
+                "listing",
+                ownerId,
+                mediaFileId,
+                "image/jpeg",
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result<string>.Success(path));
+
+        await using var stream = new MemoryStream([0xFF, 0xD8, 0xFF]);
+        var result = await _service.UploadToQuarantineAsync(
+            stream,
+            "photo.jpg",
+            OwnerType.Listing,
+            ownerId,
+            mediaFileId,
+            AllowedContentTypes.Jpeg,
+            CancellationToken.None);
+
+        Assert.IsTrue(result.IsSuccess);
+        Assert.AreEqual(path, result.Value!.Value);
+    }
+
+    [TestMethod]
+    public async Task UploadToQuarantineAsync_WhenStorageFails_PropagatesError()
+    {
+        var error = SharedFailures.SystemFailed;
+        _storageService
+            .Setup(s => s.UploadToQuarantineAsync(
+                It.IsAny<Stream>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<Guid>(),
+                It.IsAny<Guid>(),
+                It.IsAny<string>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result<string>.Failure(error));
+
+        await using var stream = new MemoryStream([0xFF, 0xD8, 0xFF]);
+        var result = await _service.UploadToQuarantineAsync(
+            stream,
+            "photo.jpg",
+            OwnerType.Listing,
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            AllowedContentTypes.Jpeg,
+            CancellationToken.None);
+
+        Assert.IsTrue(result.IsFailure);
+        Assert.AreEqual(error.Code.Value, result.Error!.Code.Value);
     }
 }

@@ -8,11 +8,9 @@ using Media.Domain.Enums.Properties;
 using Media.Domain.Repositories;
 using Media.Domain.Services.Interfaces;
 using Media.Domain.ValueObjects.Ids;
-using Media.Domain.ValueObjects.Properties;
+using Media.Unit.TestSupport;
 using SharedKernel.Kernel.Results;
 using AuthId = Media.Domain.ValueObjects.Ids.AuthId;
-using UploadedByClientId = Media.Domain.ValueObjects.Ids.UploadedByClientId;
-using UploadMediaType = Media.Domain.Enums.Properties.MediaType;
 
 namespace Media.Unit.Application.UseCases;
 
@@ -20,6 +18,8 @@ namespace Media.Unit.Application.UseCases;
 public class WaitMediaFileEventUseCaseTests
 {
     private readonly Mock<IMediaRepo> _mediaRepo = new();
+    private readonly Mock<IMediaUploadRepo> _mediaUploadRepo = new();
+    private readonly Mock<IMediaPolicyRepo> _mediaPolicyRepo = new();
     private readonly Mock<IMediaEventAccessService> _mediaEventAccessService = new();
     private readonly Mock<IMediaEventWaitService> _mediaEventWaitService = new();
     private WaitMediaFileEventUseCase _useCase = null!;
@@ -28,6 +28,8 @@ public class WaitMediaFileEventUseCaseTests
     public void Setup() =>
         _useCase = new WaitMediaFileEventUseCase(
             _mediaRepo.Object,
+            _mediaUploadRepo.Object,
+            _mediaPolicyRepo.Object,
             _mediaEventAccessService.Object,
             _mediaEventWaitService.Object);
 
@@ -40,13 +42,16 @@ public class WaitMediaFileEventUseCaseTests
         _mediaRepo
             .Setup(r => r.GetByIdAsync(mediaFileId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<MediaFile>.Failure(SharedFailures.NotFound(nameof(MediaFile))));
+        _mediaUploadRepo
+            .Setup(r => r.GetByIdAsync(mediaFileId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result<MediaUpload>.Failure(SharedFailures.NotFound(nameof(MediaUpload))));
 
         var result = await _useCase.Handle(
             new WaitMediaFileEventQuery(mediaFileId, userId, null),
             CancellationToken.None);
 
         Assert.IsTrue(result.IsFailure);
-        Assert.AreEqual(SharedFailures.NotFound(nameof(MediaFile)).Code.Value, result.Error!.Code.Value);
+        Assert.AreEqual(SharedFailures.NotFound(nameof(MediaUpload)).Code.Value, result.Error!.Code.Value);
     }
 
     [TestMethod]
@@ -54,13 +59,21 @@ public class WaitMediaFileEventUseCaseTests
     {
         var mediaFileId = MediaFileId.New();
         var userId = AuthId.New();
-        var mediaFile = CreateMediaFile(mediaFileId);
+        var upload = MediaTestFactory.CreateUpload(id: mediaFileId, ownerType: OwnerType.User);
 
         _mediaRepo
             .Setup(r => r.GetByIdAsync(mediaFileId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result<MediaFile>.Success(mediaFile));
+            .ReturnsAsync(Result<MediaFile>.Failure(SharedFailures.NotFound(nameof(MediaFile))));
+        _mediaUploadRepo
+            .Setup(r => r.GetByIdAsync(mediaFileId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result<MediaUpload>.Success(upload));
         _mediaEventAccessService
-            .Setup(s => s.CanAccessEventsAsync(mediaFile, userId, null, It.IsAny<CancellationToken>()))
+            .Setup(s => s.CanAccessEventsAsync(
+                upload.OwnerId,
+                upload.OwnerType,
+                userId,
+                null,
+                It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<bool>.Failure(MediaFileError.Permission));
 
         var result = await _useCase.Handle(
@@ -76,14 +89,22 @@ public class WaitMediaFileEventUseCaseTests
     {
         var mediaFileId = MediaFileId.New();
         var userId = AuthId.New();
-        var mediaFile = CreateMediaFile(mediaFileId);
+        var upload = MediaTestFactory.CreateUpload(id: mediaFileId, ownerType: OwnerType.User);
         var mediaEvent = new MediaFileEvent("fileApproved", new { mediaFileId = mediaFileId.Value });
 
         _mediaRepo
             .Setup(r => r.GetByIdAsync(mediaFileId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result<MediaFile>.Success(mediaFile));
+            .ReturnsAsync(Result<MediaFile>.Failure(SharedFailures.NotFound(nameof(MediaFile))));
+        _mediaUploadRepo
+            .Setup(r => r.GetByIdAsync(mediaFileId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result<MediaUpload>.Success(upload));
         _mediaEventAccessService
-            .Setup(s => s.CanAccessEventsAsync(mediaFile, userId, null, It.IsAny<CancellationToken>()))
+            .Setup(s => s.CanAccessEventsAsync(
+                upload.OwnerId,
+                upload.OwnerType,
+                userId,
+                null,
+                It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<bool>.Success(true));
         _mediaEventWaitService
             .Setup(s => s.WaitForTerminalEventAsync(mediaFileId, It.IsAny<CancellationToken>()))
@@ -97,16 +118,4 @@ public class WaitMediaFileEventUseCaseTests
         Assert.IsFalse(result.Value!.IsTimeout);
         Assert.AreEqual(mediaEvent, result.Value.Event);
     }
-
-    private static MediaFile CreateMediaFile(MediaFileId mediaFileId) =>
-        MediaFile.Create(
-            mediaFileId,
-            new OwnerId(Guid.NewGuid()),
-            OwnerType.User,
-            UploadMediaType.Photo,
-            MediaStatus.Pending,
-            StoragePath.FromDatabase("quarantine/user/id/file.jpg"),
-            AllowedContentTypes.Jpeg,
-            MediaFileSize.FromDatabase(1024),
-            UploadedByClientId.New()).Value!;
 }
