@@ -9,6 +9,7 @@ namespace Media.Infrastructure.Context;
 public class MediaDbContext(DbContextOptions<MediaDbContext> options) : ModuleDbContext(options)
 {
     public DbSet<MediaFile> MediaFile { get; set; } = null!;
+    public DbSet<MediaUpload> MediaUpload { get; set; } = null!;
     public DbSet<MediaPolicy> MediaPolicy { get; set; } = null!;
     public DbSet<MediaVariant> MediaVariant { get; set; } = null!;
 
