@@ -29,26 +29,6 @@ namespace Media.Domain.ValueObjects.Properties
             return Result<Link>.Success(new Link(value));
         }
 
-        /// <summary>
-        /// Creates an optional Link. Returns Success(null) when value is null or whitespace.
-        /// </summary>
-        public static Result<Link?> CreateOptional(string? value)
-        {
-            if (value == null || string.IsNullOrWhiteSpace(value))
-            {
-                return Result<Link?>.Success(null);
-            }
-            var r = Create(value);
-            if (r.IsFailure)
-            {
-                return Result<Link?>.FromResult(r);
-            }
-            return Result<Link?>.Success(r.Value);
-        }
-
-        /// <summary>Parses a URL produced by the storage upload pipeline.</summary>
-        public static Result<Link> FromUploadedUrl(string? value) => Create(value);
-
         [ExcludeFromCodeCoverage]
         public static Link FromDatabase(string value) => new(value);
     }

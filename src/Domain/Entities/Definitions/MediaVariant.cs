@@ -10,9 +10,8 @@ public sealed class MediaVariant : Entity<MediaVariantId>
 {
     public MediaFileId MediaFileId { get; private set; } = null!;
     public VariantType VariantType { get; private set; }
-    public VariantUrl Url { get; private set; } = null!;
-    public VariantDimension? Width { get; private set; }
-    public VariantDimension? Height { get; private set; }
+    public Link Url { get; private set; } = null!;
+    public MediaVariantMetadata? Metadata { get; private set; }
     public MediaFileSize FileSizeBytes { get; private set; } = null!;
 
     private MediaVariant(MediaVariantId id) : base(id) { }
@@ -23,17 +22,15 @@ public sealed class MediaVariant : Entity<MediaVariantId>
     public static MediaVariant Create(
         MediaFileId mediaFileId,
         VariantType variantType,
-        VariantUrl url,
-        VariantDimension? width,
-        VariantDimension? height,
+        Link url,
+        MediaVariantMetadata? metadata,
         MediaFileSize fileSizeBytes)
         => new(MediaVariantId.New())
         {
             MediaFileId = mediaFileId,
             VariantType = variantType,
             Url = url,
-            Width = width,
-            Height = height,
+            Metadata = metadata,
             FileSizeBytes = fileSizeBytes,
         };
 }

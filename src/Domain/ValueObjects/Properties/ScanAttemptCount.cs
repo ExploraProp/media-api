@@ -21,6 +21,5 @@ public sealed record ScanAttemptCount
         return Result<ScanAttemptCount>.Success(new ScanAttemptCount(value));
     }
 
-    public static ScanAttemptCount Zero() => new(0);
     public static ScanAttemptCount FromDatabase(int value) => new(value);
 }
