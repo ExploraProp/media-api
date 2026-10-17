@@ -1,4 +1,3 @@
-using Media.Domain.Entities.Errors;
 using Media.Domain.Enums.Properties;
 using Media.Domain.Events;
 using Media.Domain.ValueObjects.Ids;
@@ -10,26 +9,35 @@ using UploadedByClientId = Media.Domain.ValueObjects.Ids.UploadedByClientId;
 
 namespace Media.Domain.Entities.Definitions;
 
+/// <summary>
+/// Durable ready media. Created only when a <see cref="MediaUpload"/> is approved (same Id).
+/// <see cref="Entity{TId}.CreatedAt"/> is the approval/ready time.
+/// Access is owned by <see cref="MediaPolicy"/> for <see cref="OwnerType"/>.
+/// </summary>
 public class MediaFile : AggregateRoot<MediaFileId>
 {
     private List<MediaVariant> _variants = [];
 
     public OwnerId OwnerId { get; private set; } = null!;
     public OwnerType OwnerType { get; private set; }
-    public MediaType MediaType { get; private set; }
-    public MediaStatus Status { get; private set; }
-    public StoragePath QuarantinePath { get; private set; } = null!;
-    public Link? PublicUrl { get; private set; }
-    public AccessLevel AccessLevel { get; private set; }
+    /// <summary>Source MIME (jpeg/png/…); derived variants may be webp.</summary>
     public AllowedContentTypes ContentType { get; private set; }
-    public MediaFileSize FileSizeBytes { get; private set; } = null!;
-    public DateTime UploadedAt { get; private set; }
-    public DateTime? ApprovedAt { get; private set; }
-    public ScanAttemptCount ScanAttempts { get; private set; } = null!;
     public UploadedByClientId UploadedByClientUserId { get; private set; } = null!;
     public IReadOnlyList<MediaVariant> Variants => _variants.AsReadOnly();
-    public bool IsApproved => Status == MediaStatus.Approved;
-    public bool IsPrivate => AccessLevel == AccessLevel.Private;
+
+    public MediaVariant? OriginalVariant =>
+        _variants.FirstOrDefault(v => v.VariantType == VariantType.Original);
+
+    /// <summary>
+    /// Public Original variant URL when <paramref name="accessLevel"/> is Public; otherwise null.
+    /// </summary>
+    public string? ResolvePublicUrl(AccessLevel accessLevel)
+    {
+        if (accessLevel != AccessLevel.Public)
+            return null;
+
+        return OriginalVariant?.Url.Value;
+    }
 
     private MediaFile(MediaFileId id) : base(id) { }
 
@@ -37,126 +45,44 @@ public class MediaFile : AggregateRoot<MediaFileId>
     private MediaFile() : base(new MediaFileId(Guid.Empty)) { }
 
     public static Result<MediaFile> Create(
-        MediaFileId id,
-        OwnerId ownerId,
-        OwnerType ownerType,
-        MediaType mediaType,
-        MediaStatus status,
-        StoragePath quarantinePath,
-        AllowedContentTypes contentType,
-        MediaFileSize fileSizeBytes,
-        UploadedByClientId uploadedByClientUserId)
+        MediaUpload upload,
+        AccessLevel accessLevel,
+        IReadOnlyList<PromotedVariantInput> promotedVariants)
     {
-        var mediaFile = new MediaFile(id)
+        var mediaFile = new MediaFile(upload.Id)
         {
-            OwnerId = ownerId,
-            OwnerType = ownerType,
-            MediaType = mediaType,
-            Status = status,
-            QuarantinePath = quarantinePath,
-            ContentType = contentType,
-            FileSizeBytes = fileSizeBytes,
-            UploadedAt = DateTime.UtcNow,
-            ScanAttempts = ScanAttemptCount.Zero(),
-            UploadedByClientUserId = uploadedByClientUserId,
-            AccessLevel = AccessLevel.Private,
+            OwnerId = upload.OwnerId,
+            OwnerType = upload.OwnerType,
+            ContentType = upload.ContentType,
+            UploadedByClientUserId = upload.UploadedByClientUserId,
         };
+
+        mediaFile._variants.AddRange(
+            promotedVariants.Select(input => MediaVariant.Create(
+                upload.Id,
+                input.VariantType,
+                input.Url,
+                input.Metadata,
+                input.FileSizeBytes)));
+
+        var eventVariants = mediaFile._variants
+            .Select(v => new MediaVariantSnapshot(v.VariantType.ToI18nCode(), v.Url.Value))
+            .ToList();
+
+        mediaFile.RaiseDomainEvent(new FileApproved(
+            mediaFile.ResolvePublicUrl(accessLevel),
+            upload.OwnerId,
+            upload.OwnerType,
+            accessLevel,
+            eventVariants,
+            upload.Id));
 
         return Result<MediaFile>.Success(mediaFile);
     }
 
-    public bool CanBeDeleted() => Status != MediaStatus.Scanning;
-
     public Result<MediaFile> Delete()
     {
-        if (Status == MediaStatus.Scanning)
-            return Result<MediaFile>.Failure(MediaFileError.OngoingScanning);
-
         RaiseDomainEvent(new FileDeleted(Id, OwnerId, OwnerType));
-        return Result<MediaFile>.Success(this);
-    }
-
-    public Result<MediaFile> Approve(
-        string? publicUrl,
-        AccessLevel accessLevel,
-        IReadOnlyList<PromotedVariantInput> promotedVariants)
-    {
-        if (Status != MediaStatus.Scanning)
-            return Result<MediaFile>.Failure(MediaFileError.NotScanning);
-
-        Status = MediaStatus.Approved;
-        AccessLevel = accessLevel;
-        PublicUrl = publicUrl != null ? Link.FromDatabase(publicUrl) : null;
-        ApprovedAt = DateTime.UtcNow;
-
-        _variants.AddRange(
-            promotedVariants
-                .Select(input => MediaVariant.Create(
-                    Id,
-                    input.VariantType,
-                    input.Url,
-                    input.Width,
-                    input.Height,
-                    input.FileSizeBytes))
-        );
-
-
-        var eventVariants = _variants
-            .Select(v => new MediaVariantSnapshot(v.VariantType.ToI18nCode(), v.Url.Value))
-            .ToList();
-
-        RaiseDomainEvent(new FileApproved(
-            publicUrl,
-            OwnerId,
-            OwnerType,
-            accessLevel,
-            eventVariants,
-            Id));
-
-        UpdateTimestamps();
-        return Result<MediaFile>.Success(this);
-    }
-
-    public Result<MediaFile> Reject(string reason)
-    {
-        if (Status != MediaStatus.Scanning)
-            return Result<MediaFile>.Failure(MediaFileError.NotScanning);
-
-        Status = MediaStatus.Rejected;
-        RaiseDomainEvent(new FileRejected(OwnerId, OwnerType, reason, Id));
-        UpdateTimestamps();
-        return Result<MediaFile>.Success(this);
-    }
-
-    public Result<MediaFile> MarkFailed(string reason)
-    {
-        if (Status != MediaStatus.Scanning)
-            return Result<MediaFile>.Failure(MediaFileError.NotScanning);
-
-        Status = MediaStatus.Failed;
-        RaiseDomainEvent(new FileRejected(OwnerId, OwnerType, reason, Id));
-        UpdateTimestamps();
-        return Result<MediaFile>.Success(this);
-    }
-
-    public Result<MediaFile> IncrementScanAttempt()
-    {
-        if (Status != MediaStatus.Scanning)
-            return Result<MediaFile>.Failure(MediaFileError.NotScanning);
-
-        ScanAttempts = ScanAttemptCount.FromDatabase(ScanAttempts.Value + 1);
-        UpdateTimestamps();
-        return Result<MediaFile>.Success(this);
-    }
-
-    public Result<MediaFile> BeginScan()
-    {
-        if (Status != MediaStatus.Pending)
-            return Result<MediaFile>.Failure(MediaFileError.NotPending);
-
-        Status = MediaStatus.Scanning;
-        ScanAttempts = ScanAttemptCount.FromDatabase(ScanAttempts.Value + 1);
-        UpdateTimestamps();
         return Result<MediaFile>.Success(this);
     }
 
