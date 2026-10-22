@@ -1162,7 +1162,7 @@
           "MediatR": "[13.1.0, )",
           "Microsoft.EntityFrameworkCore.SqlServer": "[10.0.12, )",
           "Microsoft.OpenApi": "[2.12.2, )",
-          "SharedKernel": "[2.0.35, )",
+          "SharedKernel": "[2.0.38, )",
           "SixLabors.ImageSharp": "[4.1.3, )"
         }
       },
@@ -1177,7 +1177,7 @@
           "Microsoft.EntityFrameworkCore.SqlServer": "[10.0.12, )",
           "Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore": "[10.0.12, )",
           "Microsoft.OpenApi": "[2.12.2, )",
-          "SharedKernel": "[2.0.35, )",
+          "SharedKernel": "[2.0.38, )",
           "System.IdentityModel.Tokens.Jwt": "[8.0.1, )"
         }
       },
@@ -1215,7 +1215,7 @@
           "Reqnroll": "[3.3.4, )",
           "Reqnroll.MSTest": "[3.3.4, )",
           "SSH.NET": "[2026.0.0, )",
-          "SharedKernel": "[2.0.36, )",
+          "SharedKernel": "[2.0.38, )",
           "StackExchange.Redis": "[2.8.24, )",
           "Testcontainers": "[4.2.0, )",
           "Testcontainers.MsSql": "[4.2.0, )",

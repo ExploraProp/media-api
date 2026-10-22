@@ -5,8 +5,8 @@
 services:
   media.api:
     build:
-      context: ../..
-      dockerfile: src/API/Dockerfile
+      context: ../../..
+      dockerfile: media-api/src/API/Dockerfile
       secrets:
         - nuget_auth_token
         - sixlabors_license_key
