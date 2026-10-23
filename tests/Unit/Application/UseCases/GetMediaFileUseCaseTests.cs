@@ -61,7 +61,7 @@ public class GetMediaFileUseCaseTests
         var result = await _useCase.Handle(new GetMediaFileQuery(mediaFileId), CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        Assert.AreEqual(MediaStatus.Pending.ToI18nCode(), result.Value!.Status);
+        Assert.AreEqual(MediaStatus.Pending.ToI18nCode(), result.Value!.Status.I18nCode);
     }
 
     [TestMethod]

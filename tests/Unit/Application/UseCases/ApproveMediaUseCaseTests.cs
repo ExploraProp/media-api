@@ -109,7 +109,7 @@ public class ApproveMediaUseCaseTests
         var result = await _useCase.Handle(CreateCommand(), CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        Assert.AreEqual(MediaStatus.Approved.ToI18nCode(), result.Value!.Status);
+        Assert.AreEqual(MediaStatus.Approved.ToI18nCode(), result.Value!.Status.I18nCode);
     }
 
     [TestMethod]

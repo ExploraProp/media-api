@@ -123,7 +123,6 @@ public sealed class MediaUploadSteps(
             using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(body) ? "{}" : body);
             var root = doc.RootElement;
             var id = root.TryGetProperty("id", out var idEl) ? idEl.GetString() : null;
-            var status = root.TryGetProperty("status", out var statusEl) ? statusEl.GetString() : null;
 
             if (string.IsNullOrWhiteSpace(id))
                 id = await FindLatestMediaIdForListingAsync(listingId);
@@ -131,14 +130,28 @@ public sealed class MediaUploadSteps(
             id.Should().NotBeNullOrWhiteSpace(
                 because: $"upload {(int)response.StatusCode} body must include id; body='{body}'");
 
+            static (string Code, string Label) ReadCatalogLabel(JsonElement parent, string name)
+            {
+                if (!parent.TryGetProperty(name, out var el))
+                    return ("", "");
+                if (el.ValueKind == JsonValueKind.String)
+                    return (el.GetString() ?? "", "");
+                var code = el.TryGetProperty("i18nCode", out var c) ? c.GetString() ?? "" : "";
+                var label = el.TryGetProperty("label", out var l) ? l.GetString() ?? "" : "";
+                return (code, label);
+            }
+
+            var (statusCode, statusLabel) = ReadCatalogLabel(root, "status");
+            var (ownerCode, ownerLabel) = ReadCatalogLabel(root, "ownerType");
+
             var dto = new MediaFileDto
             {
                 Id = id!,
-                Status = status ?? "",
-                StatusLabel = root.TryGetProperty("statusLabel", out var sl) ? sl.GetString() ?? "" : "",
+                Status = statusCode,
+                StatusLabel = statusLabel,
                 PublicUrl = root.TryGetProperty("publicUrl", out var pu) ? pu.GetString() : null,
-                OwnerType = root.TryGetProperty("ownerType", out var ot) ? ot.GetString() ?? "" : "",
-                OwnerTypeLabel = root.TryGetProperty("ownerTypeLabel", out var otl) ? otl.GetString() ?? "" : "",
+                OwnerType = ownerCode,
+                OwnerTypeLabel = ownerLabel,
                 UploadedAt = root.TryGetProperty("uploadedAt", out var ua) ? ua.GetString() ?? "" : "",
                 CreatedAt = root.TryGetProperty("createdAt", out var ca) ? ca.GetString() ?? "" : "",
                 UpdatedAt = root.TryGetProperty("updatedAt", out var uat) ? uat.GetString() ?? "" : "",

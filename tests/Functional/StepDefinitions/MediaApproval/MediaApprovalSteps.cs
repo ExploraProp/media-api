@@ -140,17 +140,19 @@ public sealed class MediaApprovalSteps(
             Id = dto.Id,
             CreatedAt = dto.CreatedAt,
             UpdatedAt = dto.UpdatedAt,
-            Status = dto.Status,
-            StatusLabel = dto.StatusLabel,
+            // Local generated client still uses Status/StatusLabel until OpenAPI regen;
+            // Application DTO already nests CatalogLabelDto.
+            Status = dto.Status.I18nCode,
+            StatusLabel = dto.Status.Label,
             PublicUrl = dto.PublicUrl,
-            OwnerType = dto.OwnerType,
-            OwnerTypeLabel = dto.OwnerTypeLabel,
+            OwnerType = dto.OwnerType.I18nCode,
+            OwnerTypeLabel = dto.OwnerType.Label,
             UploadedAt = dto.UploadedAt,
             Variants = dto.Variants?
                 .Select(v => new MediaVariantDto
                 {
-                    Type = v.Type,
-                    TypeLabel = v.TypeLabel,
+                    Type = v.Type.I18nCode,
+                    TypeLabel = v.Type.Label,
                     Url = v.Url,
                     Metadata = v.Metadata is null
                         ? null

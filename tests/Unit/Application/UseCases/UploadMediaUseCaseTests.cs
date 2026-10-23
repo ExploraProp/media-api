@@ -127,7 +127,7 @@ public class UploadMediaUseCaseTests
         var result = await _useCase.Handle(CreateCommand(), CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        Assert.AreEqual(MediaStatus.Pending.ToI18nCode(), result.Value!.Status);
+        Assert.AreEqual(MediaStatus.Pending.ToI18nCode(), result.Value!.Status.I18nCode);
     }
 
     [TestMethod]
