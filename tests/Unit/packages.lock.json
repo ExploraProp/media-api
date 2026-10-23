@@ -549,8 +549,8 @@
       },
       "SharedKernel": {
         "type": "Transitive",
-        "resolved": "2.0.38",
-        "contentHash": "Xk/MN7TRdOaOtjBfx/3f63Nehb6EyVBNffg0YT+gQbPTL7WyDEC/lYAJkExpyybg8exiJ4Ic1yinMxlv6qY6cg==",
+        "resolved": "2.0.39",
+        "contentHash": "QaSm7MOUr2D16HcZsrwtcS+N1+zu0OhgQTEJnW1bTAE/apZDOxd5G4VPcXwBCzA04hUEgjPXR9zg8oXUd2X52g==",
         "dependencies": {
           "FluentEmail.Smtp": "3.0.2",
           "Google.Apis.Auth": "1.70.0",
@@ -663,7 +663,7 @@
           "MediatR": "[13.1.0, )",
           "Microsoft.EntityFrameworkCore.SqlServer": "[10.0.12, )",
           "Microsoft.OpenApi": "[2.12.2, )",
-          "SharedKernel": "[2.0.38, )",
+          "SharedKernel": "[2.0.39, )",
           "SixLabors.ImageSharp": "[4.1.3, )"
         }
       }

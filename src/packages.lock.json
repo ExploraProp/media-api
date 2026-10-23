@@ -4,9 +4,9 @@
     "net10.0": {
       "Architecture": {
         "type": "Direct",
-        "requested": "[2.8.5, )",
-        "resolved": "2.8.5",
-        "contentHash": "UnhiYQunf4IUjgSJF+MAPUbdqKXyL3UGIfwdmI+B4i7cXONBfhr0dLQ4sqBzl4nOjuobuMA0owolx02kzspOCA=="
+        "requested": "[2.8.7, )",
+        "resolved": "2.8.7",
+        "contentHash": "yrF5UhpyN0pAEaUvgjy0G10Wo9m+jWmy2bsKTsyRzoDNpJitogUg5H8ZdD7oRWHgA5DDtS64rKP72q1J/BGGIw=="
       },
       "MediatR": {
         "type": "Direct",
@@ -59,9 +59,9 @@
       },
       "SharedKernel": {
         "type": "Direct",
-        "requested": "[2.0.38, )",
-        "resolved": "2.0.38",
-        "contentHash": "Xk/MN7TRdOaOtjBfx/3f63Nehb6EyVBNffg0YT+gQbPTL7WyDEC/lYAJkExpyybg8exiJ4Ic1yinMxlv6qY6cg==",
+        "requested": "[2.0.39, )",
+        "resolved": "2.0.39",
+        "contentHash": "QaSm7MOUr2D16HcZsrwtcS+N1+zu0OhgQTEJnW1bTAE/apZDOxd5G4VPcXwBCzA04hUEgjPXR9zg8oXUd2X52g==",
         "dependencies": {
           "FluentEmail.Smtp": "3.0.2",
           "Google.Apis.Auth": "1.70.0",

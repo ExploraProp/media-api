@@ -19,7 +19,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Media.csproj" />
-    <PackageReference Include="SharedKernel" Version="2.0.38" />
+    <PackageReference Include="SharedKernel" Version="2.0.39" />
     <PackageReference Include="IntegrationEvents" Version="1.0.0" />
   </ItemGroup>
   <ItemGroup>
