@@ -10,11 +10,9 @@ public sealed record MediaFileDto(
     string Id,
     string CreatedAt,
     string UpdatedAt,
-    string Status,
-    string StatusLabel,
+    CatalogLabelDto Status,
     string? PublicUrl,
-    string OwnerType,
-    string OwnerTypeLabel,
+    CatalogLabelDto OwnerType,
     string UploadedAt
 ) : BaseDto(Id, CreatedAt, UpdatedAt)
 {
@@ -25,8 +23,6 @@ public sealed record MediaFileDto(
         AccessLevel accessLevel,
         ICatalogLabelLocalizer labels)
     {
-        var status = MediaStatus.Approved.ToI18nCode();
-        var ownerType = entity.OwnerType.ToI18nCode();
         // Ready row CreatedAt is approval time; keep UploadedAt in the API shape as that instant.
         var readyAt = entity.CreatedAt.ToIso();
 
@@ -34,34 +30,25 @@ public sealed record MediaFileDto(
             entity.Id.ToString(),
             readyAt,
             entity.UpdatedAt.ToIso(),
-            status,
-            labels.Localize(status),
+            CatalogLabelDto.From(MediaStatus.Approved.ToI18nCode(), labels),
             entity.ResolvePublicUrl(accessLevel),
-            ownerType,
-            labels.Localize(ownerType),
+            CatalogLabelDto.From(entity.OwnerType.ToI18nCode(), labels),
             readyAt)
         {
             Variants = entity.Variants.Select(v => MediaVariantDto.FromEntity(v, labels)).ToList().AsReadOnly()
         };
     }
 
-    public static MediaFileDto FromEntity(MediaUpload entity, ICatalogLabelLocalizer labels)
-    {
-        var status = entity.Status.ToI18nCode();
-        var ownerType = entity.OwnerType.ToI18nCode();
-
-        return new(
+    public static MediaFileDto FromEntity(MediaUpload entity, ICatalogLabelLocalizer labels) =>
+        new(
             entity.Id.ToString(),
             entity.CreatedAt.ToIso(),
             entity.UpdatedAt.ToIso(),
-            status,
-            labels.Localize(status),
+            CatalogLabelDto.From(entity.Status.ToI18nCode(), labels),
             PublicUrl: null,
-            ownerType,
-            labels.Localize(ownerType),
+            CatalogLabelDto.From(entity.OwnerType.ToI18nCode(), labels),
             entity.UploadedAt.ToIso())
         {
             Variants = []
         };
-    }
 }
