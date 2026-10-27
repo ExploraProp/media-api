@@ -15,8 +15,8 @@
 
   <!-- Security pins only when standalone (monorepo bridge pulls root Directory.Build.props). -->
   <ItemGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props')">
-    <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="10.0.12" />
-    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="10.0.14" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.14" />
     <PackageReference Include="Microsoft.OpenApi" Version="2.12.2" />
   </ItemGroup>
 
@@ -82,7 +82,7 @@
 
   <!-- Standalone BC repos: architecture analyzers from GitHub Packages. -->
   <PropertyGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props')">
-    <ArchitecturePackageVersion Condition="'$(ArchitecturePackageVersion)' == ''">2.8.7</ArchitecturePackageVersion>
+    <ArchitecturePackageVersion Condition="'$(ArchitecturePackageVersion)' == ''">2.8.9</ArchitecturePackageVersion>
   </PropertyGroup>
 
   <ItemGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props') And !$(MSBuildProjectName.EndsWith('.Unit')) And !$(MSBuildProjectName.EndsWith('.Functional'))">

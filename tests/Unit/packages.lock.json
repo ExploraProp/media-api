@@ -4,9 +4,9 @@
     "net10.0": {
       "Microsoft.AspNetCore.DataProtection": {
         "type": "Direct",
-        "requested": "[10.0.12, )",
-        "resolved": "10.0.12",
-        "contentHash": "xafwaJhwtDiwlXvaW66eo5/fQ6hBVfO5dnE0EpOjKCrkwZB+LUyVSJ4k+XhH2+Yc8dl3TN7LzvHiYlJ3aub1Jw=="
+        "requested": "[10.0.14, )",
+        "resolved": "10.0.14",
+        "contentHash": "gDUH0z2bK0lPaHGy2/pIQkEtbhG3dFGSIbioy+Qu76Y+HiB0xg2TFqlSLc+DjQ2Jb/3GODGMtTh4JuufVWG7Dw=="
       },
       "Microsoft.EntityFrameworkCore.InMemory": {
         "type": "Direct",
@@ -101,11 +101,11 @@
       },
       "System.Security.Cryptography.Xml": {
         "type": "Direct",
-        "requested": "[10.0.12, )",
-        "resolved": "10.0.12",
-        "contentHash": "T3snzcc04R1JDj2XmzrLyk5fHT0YroBz5o2P+YdyJKYePSMqp8JsrxEJQPvUnK6oozQBvKLki9vnI7uMuWepKQ==",
+        "requested": "[10.0.14, )",
+        "resolved": "10.0.14",
+        "contentHash": "qpDILpfJvj65+Pvpf5drWq2+mRNSrPffJsRYVQjBmEky+V34W+w2LXDZShq0miitf5qAPKuMAQ3CUaifaS2rrw==",
         "dependencies": {
-          "System.Security.Cryptography.Pkcs": "10.0.12"
+          "System.Security.Cryptography.Pkcs": "10.0.14"
         }
       },
       "Azure.Core": {
@@ -549,8 +549,8 @@
       },
       "SharedKernel": {
         "type": "Transitive",
-        "resolved": "2.0.39",
-        "contentHash": "QaSm7MOUr2D16HcZsrwtcS+N1+zu0OhgQTEJnW1bTAE/apZDOxd5G4VPcXwBCzA04hUEgjPXR9zg8oXUd2X52g==",
+        "resolved": "2.0.45",
+        "contentHash": "8+qnzdVF2KLp6Lm7UBmIbcM8XN/qlS3DZEh+Wh/kaE/oVc++svygP0zc/2b9sbq8J+IlcWEj/Q0ejT9tPk1MnA==",
         "dependencies": {
           "FluentEmail.Smtp": "3.0.2",
           "Google.Apis.Auth": "1.70.0",
@@ -640,8 +640,8 @@
       },
       "System.Security.Cryptography.Pkcs": {
         "type": "Transitive",
-        "resolved": "10.0.12",
-        "contentHash": "W6BsawU2tB2qy6u4+3cBOSOmiTUgYWW365b5WMVA1bDxQwZZeNWD+qufKJkDQNKzAKq4b6Q04DDKhmr2SNJ1eg=="
+        "resolved": "10.0.14",
+        "contentHash": "Wz+IgL2xpg8KJ4i2VWj6uz1PmZNu4Q0Ljlwd73P9Vze5NcOBtctLii3itV0PB2MpOqwqDEGfB6RCdv94A4E5yQ=="
       },
       "System.Security.Cryptography.ProtectedData": {
         "type": "Transitive",
@@ -663,7 +663,7 @@
           "MediatR": "[13.1.0, )",
           "Microsoft.EntityFrameworkCore.SqlServer": "[10.0.12, )",
           "Microsoft.OpenApi": "[2.12.2, )",
-          "SharedKernel": "[2.0.39, )",
+          "SharedKernel": "[2.0.45, )",
           "SixLabors.ImageSharp": "[4.1.3, )"
         }
       }
