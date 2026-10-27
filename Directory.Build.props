@@ -32,7 +32,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props') And $(MSBuildProjectName.EndsWith('.Unit'))">
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.12" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.14" />
     <PackageReference Include="Moq" Version="4.20.72" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
@@ -69,7 +69,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('$(MSBuildThisFileDirectory)../Directory.Build.props') And $(MSBuildProjectName.EndsWith('.API'))">
-    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.12">
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.14">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
