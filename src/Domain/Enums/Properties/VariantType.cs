@@ -34,12 +34,9 @@ public static class VariantTypeExtensions
 
     public static string ToI18nCode(this VariantType variantType) => EnumI18n.GetI18nCode(variantType);
 
-    public static Result<VariantType> TryParseVariantType(string? value)
-    {
-        if (Enum.TryParse<VariantType>(value, ignoreCase: true, out var parsed) &&
-            Enum.IsDefined(parsed))
-            return Result<VariantType>.Success(parsed);
+    public static Result<VariantType> TryParseVariantType(string? value) =>
+        EnumParse.TryParse<VariantType>(value, VariantTypeError.Invalid, VariantTypeError.Empty);
 
-        return Result<VariantType>.Failure(VariantTypeError.Invalid);
-    }
+    public static bool TryFromOrdinalVariantType(string? value, out VariantType result) =>
+        EnumParse.TryFromOrdinal(value, out result);
 }
