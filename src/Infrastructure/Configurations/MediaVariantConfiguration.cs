@@ -1,10 +1,12 @@
 using Media.Domain.Entities.Definitions;
+using Media.Domain.Enums.Properties;
 using Media.Domain.ValueObjects.Ids;
 using Media.Domain.ValueObjects.Properties;
 using Media.Infrastructure.Persistence;
 using Media.Infrastructure.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SharedKernel.Kernel.Results;
 
 namespace Media.Infrastructure.Configurations;
 
@@ -12,7 +14,8 @@ public sealed class MediaVariantConfiguration : IEntityTypeConfiguration<MediaVa
 {
     public void Configure(EntityTypeBuilder<MediaVariant> builder)
     {
-        builder.ToTable("MediaVariant");
+        builder.ToTable("MediaVariant", t => t.HasCheckConstraint(
+            MediaConstraints.MediaVariantVariantTypeCheck, EnumParse.CheckConstraintSql<VariantType>("VariantType")));
 
         builder.HasKey(v => v.Id);
         builder.Property(v => v.Id)
@@ -26,7 +29,7 @@ public sealed class MediaVariantConfiguration : IEntityTypeConfiguration<MediaVa
 
         builder.Property(v => v.VariantType)
             .HasColumnName("VariantType")
-            .HasConversion<int>()
+            .HasConversion(v => (int)v, v => EnumParse.FromDatabase<VariantType>(v))
             .IsRequired();
 
         builder.Property(v => v.Url)

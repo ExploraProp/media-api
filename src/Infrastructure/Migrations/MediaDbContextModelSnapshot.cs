@@ -64,7 +64,12 @@ namespace Media.Infrastructure.Migrations
                     b.HasIndex("OwnerId", "OwnerType")
                         .HasDatabaseName("IX_MediaFile_OwnerId_OwnerType");
 
-                    b.ToTable("MediaFile", (string)null);
+                    b.ToTable("MediaFile", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_MediaFile_ContentType", "[ContentType] IN (0, 1, 2, 4, 8, 16)");
+
+                            t.HasCheckConstraint("CK_MediaFile_OwnerType", "[OwnerType] IN (0, 1, 2, 3)");
+                        });
                 });
 
             modelBuilder.Entity("Media.Domain.Entities.Definitions.MediaPolicy", b =>
@@ -112,7 +117,14 @@ namespace Media.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("IX_MediaPolicy_OwnerType");
 
-                    b.ToTable("MediaPolicy", (string)null);
+                    b.ToTable("MediaPolicy", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_MediaPolicy_AccessLevel", "[AccessLevel] IN (0, 1)");
+
+                            t.HasCheckConstraint("CK_MediaPolicy_AllowedContentTypes", "[AllowedContentTypes] >= 0 AND [AllowedContentTypes] <= 31");
+
+                            t.HasCheckConstraint("CK_MediaPolicy_OwnerType", "[OwnerType] IN (0, 1, 2, 3)");
+                        });
                 });
 
             modelBuilder.Entity("Media.Domain.Entities.Definitions.MediaUpload", b =>
@@ -182,7 +194,14 @@ namespace Media.Infrastructure.Migrations
                     b.HasIndex("OwnerId", "OwnerType")
                         .HasDatabaseName("IX_MediaUpload_OwnerId_OwnerType");
 
-                    b.ToTable("MediaUpload", (string)null);
+                    b.ToTable("MediaUpload", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_MediaUpload_ContentType", "[ContentType] IN (0, 1, 2, 4, 8, 16)");
+
+                            t.HasCheckConstraint("CK_MediaUpload_OwnerType", "[OwnerType] IN (0, 1, 2, 3)");
+
+                            t.HasCheckConstraint("CK_MediaUpload_Status", "[Status] IN (0, 1, 2, 3, 4)");
+                        });
                 });
 
             modelBuilder.Entity("Media.Domain.Entities.Definitions.MediaVariant", b =>
@@ -231,7 +250,10 @@ namespace Media.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("UX_MediaVariant_MediaFileId_VariantType");
 
-                    b.ToTable("MediaVariant", (string)null);
+                    b.ToTable("MediaVariant", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_MediaVariant_VariantType", "[VariantType] IN (0, 1, 2, 3)");
+                        });
                 });
 
             modelBuilder.Entity("SharedKernel.Kernel.Outbox.OutboxEvent", b =>
