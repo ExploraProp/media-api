@@ -1,12 +1,10 @@
 using Media.Domain.Entities.Definitions;
 using Media.Domain.Enums.Properties;
 using Media.Domain.ValueObjects.Ids;
-using Media.Domain.ValueObjects.Properties;
 using Media.Infrastructure.Context;
 using Media.Infrastructure.Repositories;
+using Media.Unit.TestSupport;
 using SharedKernel.Kernel.Results;
-using UploadedByClientId = Media.Domain.ValueObjects.Ids.UploadedByClientId;
-using UploadMediaType = Media.Domain.Enums.Properties.MediaType;
 
 namespace Media.Unit.Infrastructure.Repositories;
 
@@ -34,16 +32,7 @@ public class MediaRepoTests
     }
 
     private static MediaFile CreateMediaFile(Guid ownerId, OwnerType ownerType) =>
-        MediaFile.Create(
-            MediaFileId.New(),
-            new OwnerId(ownerId),
-            ownerType,
-            UploadMediaType.Photo,
-            MediaStatus.Pending,
-            StoragePath.FromDatabase($"quarantine/listing/{ownerId}/file.jpg"),
-            AllowedContentTypes.Jpeg,
-            MediaFileSize.FromDatabase(1024),
-            UploadedByClientId.New()).Value!;
+        MediaTestFactory.CreateReadyMediaFile(ownerId: new OwnerId(ownerId));
 
     [TestMethod]
     public async Task CountByOwnerAsync_WhenFilesExist_ShouldReturnCount()

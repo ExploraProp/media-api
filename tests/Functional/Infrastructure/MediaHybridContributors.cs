@@ -1,9 +1,9 @@
+using ExploraProp.Marketing.Internal.ApiClient;
+using Functional.Application;
+using Functional.Application.Ports;
+using Functional.Domain.Enums.Properties;
 using Functional.Infrastructure;
-using Media.Domain.Entities.Definitions;
-using Media.Domain.Enums.Properties;
 using Media.Domain.Services.Interfaces;
-using Media.Domain.ValueObjects.Ids;
-using Media.Domain.ValueObjects.Properties;
 using Media.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,14 +16,14 @@ namespace Media.Functional.Infrastructure;
 
 public sealed class MediaSutHostContributor : ISutHostContributor
 {
-    public string SutHost => MeshHosts.Media;
+    public ApplicationProgrammingInterface SutHost => ApplicationProgrammingInterface.Media;
     public ISutHost Create(WorkerOptions options, IReadOnlyDictionary<string, string> siblingBaseUrls, SiblingInfrastructure infra)
         => new MediaSutHost(options, siblingBaseUrls, infra);
 }
 
 public sealed class MediaSqlTemplateContributor : ISqlTemplateContributor
 {
-    public string Host => MeshHosts.Media;
+    public ApplicationProgrammingInterface Host => ApplicationProgrammingInterface.Media;
     public async Task MigrateAsync(string connectionString, CancellationToken cancellationToken = default)
     {
         var opts = new DbContextOptionsBuilder<MediaDbContext>()
@@ -36,39 +36,13 @@ public sealed class MediaSqlTemplateContributor : ISqlTemplateContributor
 
 public sealed class MediaCleanupContributor : IScenarioCleanupContributor
 {
-    public string Host => MeshHosts.Media;
+    public ApplicationProgrammingInterface Host => ApplicationProgrammingInterface.Media;
     public async Task ClearUserDataAsync(IServiceProvider sutServices, CancellationToken cancellationToken = default)
     {
+        sutServices.GetService<FakeMarketingInternalClient>()?.Reset();
         await using var scope = sutServices.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<MediaDbContext>();
         await db.Set<OutboxEvent>().IgnoreQueryFilters().ExecuteDeleteAsync(cancellationToken);
-    }
-}
-
-public sealed class MediaSeedContributor : IRequiredDataSeedContributor
-{
-    public async Task SeedAsync(
-        IServiceProvider sutServices,
-        HttpClient httpClient,
-        CancellationToken cancellationToken = default)
-    {
-        await using var scope = sutServices.CreateAsyncScope();
-        var db = scope.ServiceProvider.GetRequiredService<MediaDbContext>();
-
-        if (await db.MediaPolicy.AnyAsync(p => p.OwnerType == OwnerType.Listing, cancellationToken))
-            return;
-
-        var policy = MediaPolicy.Create(
-            new MediaPolicyId(Guid.NewGuid()),
-            OwnerType.Listing,
-            MediaMaxFileSize.FromDatabase(8 * 1024 * 1024),
-            AllowedContentTypes.Jpeg | AllowedContentTypes.Png,
-            MediaMaxCount.FromDatabase(50),
-            AccessLevel.Public,
-            watermarkEnabled: true);
-
-        db.MediaPolicy.Add(policy);
-        await db.SaveChangesAsync(cancellationToken);
     }
 }
 
@@ -77,8 +51,8 @@ file sealed class MediaSutHost(WorkerOptions options, IReadOnlyDictionary<string
 {
     protected override void AddConnectionStrings(Dictionary<string, string?> values)
     {
-        values["ConnectionStrings:Media"] = Options.MediaConnectionString;
-        values["ConnectionStrings:DefaultConnection"] = Options.MediaConnectionString;
+        values["ConnectionStrings:Media"] = Options.GetConnectionString(ApplicationProgrammingInterface.Media);
+        values["ConnectionStrings:DefaultConnection"] = Options.GetConnectionString(ApplicationProgrammingInterface.Media);
     }
 
     protected override void ConfigureSutServices(IServiceCollection services)
@@ -86,11 +60,15 @@ file sealed class MediaSutHost(WorkerOptions options, IReadOnlyDictionary<string
         services.RemoveAll<DbContextOptions<MediaDbContext>>();
         services.RemoveAll<MediaDbContext>();
         services.AddDbContext<MediaDbContext>((_, o) =>
-            o.UseSqlServer(Options.MediaConnectionString, sql => sql.MigrationsAssembly(typeof(MediaDbContext).Assembly.FullName)));
+            o.UseSqlServer(Options.GetConnectionString(ApplicationProgrammingInterface.Media), sql => sql.MigrationsAssembly(typeof(MediaDbContext).Assembly.FullName)));
         services.RemoveAll<IStorageService>();
         services.AddSingleton<IStorageService, FakeStorageService>();
         services.RemoveAll<IScanService>();
         services.AddSingleton<IScanService, FakeScanService>();
+        services.RemoveAll<IMarketingInternalClient>();
+        services.AddSingleton<FakeMarketingInternalClient>();
+        services.AddSingleton<IMarketingInternalClient>(sp =>
+            sp.GetRequiredService<FakeMarketingInternalClient>());
         services.AddHostedService(sp => new MediaMigrationService(sp));
     }
 }

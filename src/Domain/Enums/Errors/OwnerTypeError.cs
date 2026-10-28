@@ -6,4 +6,5 @@ namespace Media.Domain.Enums.Errors;
 public static class OwnerTypeError
 {
     public static readonly Error Invalid = ValueObjectFailure.InvalidFormat(nameof(OwnerType));
+    public static readonly Error Empty = ValueObjectFailure.Empty(nameof(OwnerType));
 }

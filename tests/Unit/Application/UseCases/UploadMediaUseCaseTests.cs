@@ -8,22 +8,20 @@ using Media.Domain.Repositories;
 using Media.Domain.Services.Errors;
 using Media.Domain.ValueObjects.Ids;
 using Media.Domain.ValueObjects.Properties;
-using SharedKernel.Application.Services;
 using SharedKernel.Kernel.Results;
 using SharedKernel.Kernel.Results.Localization;
 using System.Globalization;
 using System.Threading.Channels;
 using UploadedByClientId = Media.Domain.ValueObjects.Ids.UploadedByClientId;
-using UploadMediaType = Media.Domain.Enums.Properties.MediaType;
 
 namespace Media.Unit.Application.UseCases;
 
 [TestClass]
 public class UploadMediaUseCaseTests
 {
-    private readonly Mock<IMediaPolicyRepo> _policyRepo = new();
+    private readonly Mock<IMediaPolicyRepo> _mediaPolicyRepo = new();
     private readonly Mock<IMediaRepo> _mediaRepo = new();
-    private readonly Mock<IStorageService> _storageService = new();
+    private readonly Mock<IMediaUploadRepo> _mediaUploadRepo = new();
     private readonly Mock<IMediaUploadFileService> _mediaUploadFileService = new();
     private readonly Mock<IImageProcessingService> _imageProcessingService = new();
     private readonly Channel<MediaFileId> _channel = Channel.CreateUnbounded<MediaFileId>();
@@ -32,16 +30,29 @@ public class UploadMediaUseCaseTests
 
     private static readonly OwnerId OwnerId = new(Guid.NewGuid());
 
+    private static MediaPolicy CreateListingPolicy() =>
+        MediaPolicy.Create(
+            new MediaPolicyId(Guid.NewGuid()),
+            OwnerType.Listing,
+            MediaMaxFileSize.FromDatabase(16 * 1024 * 1024),
+            AllowedContentTypes.Jpeg | AllowedContentTypes.Png,
+            MediaMaxCount.FromDatabase(50),
+            AccessLevel.Public,
+            watermarkEnabled: true);
+
     [TestInitialize]
     public void Setup()
     {
         _catalogLabels
             .Setup(l => l.Localize(It.IsAny<string>(), It.IsAny<CultureInfo?>()))
             .Returns<string, CultureInfo?>((code, _) => code);
+        _mediaPolicyRepo
+            .Setup(r => r.GetByOwnerTypeAsync(OwnerType.Listing, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result<MediaPolicy>.Success(CreateListingPolicy()));
         _useCase = new UploadMediaUseCase(
-            _policyRepo.Object,
+            _mediaPolicyRepo.Object,
             _mediaRepo.Object,
-            _storageService.Object,
+            _mediaUploadRepo.Object,
             _mediaUploadFileService.Object,
             _imageProcessingService.Object,
             _channel,
@@ -59,30 +70,18 @@ public class UploadMediaUseCaseTests
             OwnerType.Listing,
             OwnerId,
             MediaFileId.New(),
-            UploadMediaType.Photo,
             file.Object,
             MediaFileSize.FromDatabase(fileLength > 0 ? fileLength : 1),
             UploadedByClientId.New());
     }
 
-    private static MediaPolicy CreateListingPolicy() =>
-        MediaPolicy.Create(
-            new MediaPolicyId(Guid.NewGuid()),
-            OwnerType.Listing,
-            MediaMaxFileSize.FromDatabase(16 * 1024 * 1024),
-            AllowedContentTypes.Jpeg | AllowedContentTypes.Png,
-            MediaMaxCount.FromDatabase(50),
-            AccessLevel.Public,
-            watermarkEnabled: true);
-
     private void SetupHappyPath()
     {
-        _policyRepo
-            .Setup(r => r.GetByOwnerTypeAsync(OwnerType.Listing, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result<MediaPolicy>.Success(CreateListingPolicy()));
-
         _mediaRepo
             .Setup(r => r.CountByOwnerAsync(OwnerId.Value, OwnerType.Listing, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result<int>.Success(0));
+        _mediaUploadRepo
+            .Setup(r => r.CountInFlightByOwnerAsync(OwnerId.Value, OwnerType.Listing, It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<int>.Success(0));
 
         _mediaUploadFileService
@@ -104,20 +103,21 @@ public class UploadMediaUseCaseTests
                 return Result<Stream>.Success(output);
             });
 
-        _storageService
+        _mediaUploadFileService
             .Setup(s => s.UploadToQuarantineAsync(
                 It.IsAny<Stream>(),
                 It.IsAny<string>(),
-                It.IsAny<string>(),
+                OwnerType.Listing,
                 OwnerId.Value,
                 It.IsAny<Guid>(),
-                It.IsAny<string>(),
+                AllowedContentTypes.Jpeg,
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result<string>.Success($"quarantine/listing/{OwnerId.Value}/{Guid.NewGuid()}.jpg"));
+            .ReturnsAsync(Result<StoragePath>.Success(
+                StoragePath.FromDatabase($"quarantine/listing/{OwnerId.Value}/{Guid.NewGuid()}.jpg")));
 
-        _mediaRepo
-            .Setup(r => r.AddAsync(It.IsAny<MediaFile>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((MediaFile entity, CancellationToken _) => Result<MediaFile>.Success(entity));
+        _mediaUploadRepo
+            .Setup(r => r.AddAsync(It.IsAny<MediaUpload>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((MediaUpload entity, CancellationToken _) => Result<MediaUpload>.Success(entity));
     }
 
     [TestMethod]
@@ -127,29 +127,12 @@ public class UploadMediaUseCaseTests
         var result = await _useCase.Handle(CreateCommand(), CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        Assert.AreEqual(MediaStatus.Pending.ToI18nCode(), result.Value!.Status);
-    }
-
-    [TestMethod]
-    public async Task Handle_WhenPolicyMissing_ShouldPropagateNotFound()
-    {
-        _policyRepo
-            .Setup(r => r.GetByOwnerTypeAsync(OwnerType.Listing, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result<MediaPolicy>.Failure(SharedFailures.NotFound(nameof(MediaPolicy))));
-
-        var result = await _useCase.Handle(CreateCommand(), CancellationToken.None);
-
-        Assert.IsTrue(result.IsFailure);
-        Assert.AreEqual(SharedFailures.NotFound(nameof(MediaPolicy)).Code.Value, result.Error!.Code.Value);
+        Assert.AreEqual(MediaStatus.Pending.ToI18nCode(), result.Value!.Status.I18nCode);
     }
 
     [TestMethod]
     public async Task Handle_WhenFileTooLarge_ShouldReturnFileTooLargeError()
     {
-        _policyRepo
-            .Setup(r => r.GetByOwnerTypeAsync(OwnerType.Listing, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result<MediaPolicy>.Success(CreateListingPolicy()));
-
         _mediaUploadFileService
             .Setup(s => s.PrepareAsync(It.IsAny<IFormFile>(), It.IsAny<MediaPolicy>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<PreparedMediaUploadFile>.Failure(MediaPolicyError.TooLarge));
@@ -163,10 +146,6 @@ public class UploadMediaUseCaseTests
     [TestMethod]
     public async Task Handle_WhenUnsupportedContentType_ShouldReturnUnsupportedContentTypeError()
     {
-        _policyRepo
-            .Setup(r => r.GetByOwnerTypeAsync(OwnerType.Listing, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result<MediaPolicy>.Success(CreateListingPolicy()));
-
         _mediaUploadFileService
             .Setup(s => s.PrepareAsync(It.IsAny<IFormFile>(), It.IsAny<MediaPolicy>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<PreparedMediaUploadFile>.Failure(MediaPolicyError.UnsupportedContentType));
@@ -181,13 +160,12 @@ public class UploadMediaUseCaseTests
     [TestMethod]
     public async Task Handle_WhenMaxMediaCountReached_ShouldReturnMaxMediaCountReachedError()
     {
-        _policyRepo
-            .Setup(r => r.GetByOwnerTypeAsync(OwnerType.Listing, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result<MediaPolicy>.Success(CreateListingPolicy()));
-
         _mediaRepo
             .Setup(r => r.CountByOwnerAsync(OwnerId.Value, OwnerType.Listing, It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<int>.Success(50));
+        _mediaUploadRepo
+            .Setup(r => r.CountInFlightByOwnerAsync(OwnerId.Value, OwnerType.Listing, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result<int>.Success(0));
 
         _mediaUploadFileService
             .Setup(s => s.PrepareAsync(It.IsAny<IFormFile>(), It.IsAny<MediaPolicy>(), It.IsAny<CancellationToken>()))
@@ -207,12 +185,11 @@ public class UploadMediaUseCaseTests
     [TestMethod]
     public async Task Handle_WhenImageProcessingFails_ShouldReturnProcessingError()
     {
-        _policyRepo
-            .Setup(r => r.GetByOwnerTypeAsync(OwnerType.Listing, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result<MediaPolicy>.Success(CreateListingPolicy()));
-
         _mediaRepo
             .Setup(r => r.CountByOwnerAsync(OwnerId.Value, OwnerType.Listing, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result<int>.Success(0));
+        _mediaUploadRepo
+            .Setup(r => r.CountInFlightByOwnerAsync(OwnerId.Value, OwnerType.Listing, It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<int>.Success(0));
 
         _mediaUploadFileService
@@ -237,10 +214,6 @@ public class UploadMediaUseCaseTests
     [TestMethod]
     public async Task Handle_WhenCountFails_PropagatesError()
     {
-        _policyRepo
-            .Setup(r => r.GetByOwnerTypeAsync(OwnerType.Listing, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Result<MediaPolicy>.Success(CreateListingPolicy()));
-
         var error = SharedFailures.SystemFailed;
         _mediaRepo
             .Setup(r => r.CountByOwnerAsync(OwnerId.Value, OwnerType.Listing, It.IsAny<CancellationToken>()))

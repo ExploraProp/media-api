@@ -1,9 +1,12 @@
-# Context: this service folder only (services/Media). SharedKernel / IntegrationEvents from NuGet.
+# Context: api/ (monorepo) so ProjectReference sibling clients resolve.
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY NuGet.Config Directory.Build.props ./
-COPY src/Media.csproj ./src/
-COPY src/API/Media.API.csproj ./src/API/
+COPY media-api/NuGet.Config media-api/Directory.Build.props ./media-api/
+COPY media-api/src/Media.csproj ./media-api/src/
+COPY media-api/src/API/Media.API.csproj ./media-api/src/API/
+COPY marketing-api/NuGet.Config ./marketing-api/NuGet.Config
+COPY marketing-api/clients/ExploraProp.Marketing.Internal.ApiClient/ ./marketing-api/clients/ExploraProp.Marketing.Internal.ApiClient/
+WORKDIR /src/media-api
 RUN --mount=type=secret,id=nuget_auth_token \
     (dotnet nuget disable source local-artifacts || true) \
  && (dotnet nuget disable source local-nupkgs || true) \
@@ -12,7 +15,7 @@ RUN --mount=type=secret,id=nuget_auth_token \
     --password "$(cat /run/secrets/nuget_auth_token)" \
     --store-password-in-clear-text \
  && dotnet restore src/API/Media.API.csproj --force-evaluate
-COPY src/ ./src/
+COPY media-api/src/ ./src/
 RUN dotnet publish src/API/Media.API.csproj -c Release \
     -o /app/publish \
     -p:OpenApiGenerateDocumentsOnBuild=false \

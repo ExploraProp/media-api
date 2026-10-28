@@ -25,6 +25,7 @@ env:
   NUGET_AUTH_TOKEN: ${{ secrets.NUGET_AUTH_TOKEN }}
   FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
   FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+  SIXLABORS_LICENSE_KEY: ${{ secrets.SIXLABORS_LICENSE_KEY }}
 
 jobs:
   unit:
@@ -51,7 +52,7 @@ jobs:
           dotnet nuget update source github-exploraprop --username github --password "$NUGET_AUTH_TOKEN" --store-password-in-clear-text
           dotnet tool restore
 
-      # Unit does not need the ephemeral Kiota client; avoid building Functional here.
+      # Unit does not need the ephemeral API client; avoid building Functional here.
       - name: ⚙️ Restore
         run: dotnet restore tests/Unit/Media.Unit.csproj
 
@@ -111,7 +112,7 @@ jobs:
           set -euo pipefail
           dotnet tool run api-scripts -- secrets-ci --service Media --format github-env >> "$GITHUB_ENV"
 
-      # clients/ is gitignored — scaffold + Kiota before solution restore/build.
+      # clients/ is gitignored — scaffold + generate-client before solution restore/build.
       - name: 🧬 Generate API client
         shell: bash
         env:
@@ -346,6 +347,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           secrets: |
             nuget_auth_token=${{ secrets.NUGET_AUTH_TOKEN }}
+            sixlabors_license_key=${{ secrets.SIXLABORS_LICENSE_KEY }}
           cache-from: type=gha,scope=${{ env.IMAGE_NAME }}
           cache-to: type=gha,mode=max,scope=${{ env.IMAGE_NAME }}
 

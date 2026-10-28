@@ -16,12 +16,9 @@ public static class MediaStatusExtensions
 {
     public static string ToI18nCode(this MediaStatus status) => EnumI18n.GetI18nCode(status);
 
-    public static Result<MediaStatus> TryParseMediaStatus(string? value)
-    {
-        if (Enum.TryParse<MediaStatus>(value, ignoreCase: true, out var parsed) &&
-            Enum.IsDefined(parsed))
-            return Result<MediaStatus>.Success(parsed);
+    public static Result<MediaStatus> TryParseMediaStatus(string? value) =>
+        EnumParse.TryParse<MediaStatus>(value, MediaStatusError.Invalid, MediaStatusError.Empty);
 
-        return Result<MediaStatus>.Failure(MediaStatusError.Invalid);
-    }
+    public static bool TryFromOrdinalMediaStatus(string? value, out MediaStatus result) =>
+        EnumParse.TryFromOrdinal(value, out result);
 }

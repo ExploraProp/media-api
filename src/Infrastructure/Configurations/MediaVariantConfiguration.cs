@@ -1,9 +1,12 @@
 using Media.Domain.Entities.Definitions;
+using Media.Domain.Enums.Properties;
 using Media.Domain.ValueObjects.Ids;
 using Media.Domain.ValueObjects.Properties;
+using Media.Infrastructure.Persistence;
 using Media.Infrastructure.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SharedKernel.Kernel.Results;
 
 namespace Media.Infrastructure.Configurations;
 
@@ -11,7 +14,8 @@ public sealed class MediaVariantConfiguration : IEntityTypeConfiguration<MediaVa
 {
     public void Configure(EntityTypeBuilder<MediaVariant> builder)
     {
-        builder.ToTable("MediaVariant");
+        builder.ToTable("MediaVariant", t => t.HasCheckConstraint(
+            MediaConstraints.MediaVariantVariantTypeCheck, EnumParse.CheckConstraintSql<VariantType>("VariantType")));
 
         builder.HasKey(v => v.Id);
         builder.Property(v => v.Id)
@@ -25,26 +29,21 @@ public sealed class MediaVariantConfiguration : IEntityTypeConfiguration<MediaVa
 
         builder.Property(v => v.VariantType)
             .HasColumnName("VariantType")
-            .HasConversion<int>()
+            .HasConversion(v => (int)v, v => EnumParse.FromDatabase<VariantType>(v))
             .IsRequired();
 
         builder.Property(v => v.Url)
-            .HasConversion(v => v.Value, v => VariantUrl.FromStorage(v))
+            .HasConversion(v => v.Value, v => Link.FromDatabase(v))
             .HasColumnName("Url")
             .HasMaxLength(1024)
             .IsRequired();
 
-        builder.Property(v => v.Width)
+        builder.Property(v => v.Metadata)
             .HasConversion(
-                v => v != null ? (int?)v.Value : null,
-                v => v != null ? VariantDimension.From(v.Value) : null)
-            .HasColumnName("Width");
-
-        builder.Property(v => v.Height)
-            .HasConversion(
-                v => v != null ? (int?)v.Value : null,
-                v => v != null ? VariantDimension.From(v.Value) : null)
-            .HasColumnName("Height");
+                v => MediaVariantMetadataJsonConversions.Serialize(v),
+                v => MediaVariantMetadataJsonConversions.Deserialize(v))
+            .HasColumnName("Metadata")
+            .HasColumnType("nvarchar(max)");
 
         builder.Property(v => v.FileSizeBytes)
             .HasConversion(v => v.Value, v => MediaFileSize.FromDatabase(v))

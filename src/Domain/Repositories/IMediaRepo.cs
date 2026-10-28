@@ -12,6 +12,4 @@ public interface IMediaRepo
     Task<Result<MediaFile>> GetByIdAsync(MediaFileId id, CancellationToken ct);
     Task<Result<bool>> UpdateAsync(MediaFile mediaFile, CancellationToken ct);
     Task<Result<bool>> DeleteAsync(MediaFileId id, CancellationToken ct);
-    Task<Result<IReadOnlyList<MediaFile>>> GetByStatusesAsync(IReadOnlyList<MediaStatus> statuses, CancellationToken ct);
-    Task<Result<IReadOnlyList<MediaFile>>> GetOrphansAsync(DateTime pendingBefore, int maxCount, CancellationToken ct);
 }

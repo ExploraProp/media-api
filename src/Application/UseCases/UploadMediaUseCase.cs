@@ -2,12 +2,9 @@ using Media.Application.Commands;
 using Media.Application.Dto;
 using Media.Application.Services.Interfaces;
 using Media.Domain.Entities.Definitions;
-using Media.Domain.Enums.Properties;
 using Media.Domain.Repositories;
 using Media.Domain.ValueObjects.Ids;
-using Media.Domain.ValueObjects.Properties;
 using MediatR;
-using SharedKernel.Application.Services;
 using SharedKernel.Kernel.Results;
 using SharedKernel.Kernel.Results.Localization;
 using System.Threading.Channels;
@@ -17,7 +14,7 @@ namespace Media.Application.UseCases;
 public sealed class UploadMediaUseCase(
     IMediaPolicyRepo mediaPolicyRepo,
     IMediaRepo mediaRepo,
-    IStorageService storageService,
+    IMediaUploadRepo mediaUploadRepo,
     IMediaUploadFileService mediaUploadFileService,
     IImageProcessingService imageProcessingService,
     Channel<MediaFileId> channel,
@@ -35,49 +32,47 @@ public sealed class UploadMediaUseCase(
         if (preparedResult.IsFailure) return Result<MediaFileDto>.FromResult(preparedResult);
         await using var prepared = preparedResult.Value!;
 
-        var countResult = await mediaRepo.CountByOwnerAsync(command.OwnerId.Value, command.OwnerType, cancellationToken);
-        if (countResult.IsFailure) return Result<MediaFileDto>.FromResult(countResult);
+        var readyCountResult = await mediaRepo.CountByOwnerAsync(command.OwnerId.Value, command.OwnerType, cancellationToken);
+        if (readyCountResult.IsFailure) return Result<MediaFileDto>.FromResult(readyCountResult);
 
-        var mediaCountResult = policy.ValidateMediaCount(countResult.Value!);
+        var inFlightCountResult = await mediaUploadRepo.CountInFlightByOwnerAsync(
+            command.OwnerId.Value, command.OwnerType, cancellationToken);
+        if (inFlightCountResult.IsFailure) return Result<MediaFileDto>.FromResult(inFlightCountResult);
+
+        var mediaCountResult = policy.ValidateMediaCount(readyCountResult.Value! + inFlightCountResult.Value!);
         if (mediaCountResult.IsFailure) return Result<MediaFileDto>.FromResult(mediaCountResult);
 
         var stripResult = await imageProcessingService.StripExifAsync(prepared.Stream, prepared.ContentType, cancellationToken);
         if (stripResult.IsFailure) return Result<MediaFileDto>.FromResult(stripResult);
 
         await using var strippedStream = stripResult.Value!;
-        var uploadResult = await storageService.UploadToQuarantineAsync(
+        var quarantinePathResult = await mediaUploadFileService.UploadToQuarantineAsync(
             strippedStream,
             command.File.FileName,
-            command.OwnerType.ToI18nCode(),
+            command.OwnerType,
             command.OwnerId.Value,
             command.MediaFileId.Value,
-            prepared.ContentType.ToMimeType(),
+            prepared.ContentType,
             cancellationToken);
-
-        if (uploadResult.IsFailure) return Result<MediaFileDto>.FromResult(uploadResult);
-
-        var quarantinePathResult = StoragePath.FromQuarantineUpload(uploadResult.Value);
         if (quarantinePathResult.IsFailure) return Result<MediaFileDto>.FromResult(quarantinePathResult);
         var quarantinePath = quarantinePathResult.Value!;
 
-        var mediaFileResult = MediaFile.Create(
+        var uploadResult = MediaUpload.Create(
             command.MediaFileId,
             command.OwnerId,
             command.OwnerType,
-            command.MediaType,
-            MediaStatus.Pending,
             quarantinePath,
             prepared.ContentType,
             command.MediaFileSize,
             command.UploadedByClientUserId);
-        if (mediaFileResult.IsFailure) return Result<MediaFileDto>.FromResult(mediaFileResult);
-        var mediaFile = mediaFileResult.Value!;
+        if (uploadResult.IsFailure) return Result<MediaFileDto>.FromResult(uploadResult);
+        var upload = uploadResult.Value!;
 
-        var addResult = await mediaRepo.AddAsync(mediaFile, cancellationToken);
+        var addResult = await mediaUploadRepo.AddAsync(upload, cancellationToken);
         if (addResult.IsFailure) return Result<MediaFileDto>.FromResult(addResult);
 
-        await _channel.Writer.WriteAsync(mediaFile.Id, cancellationToken);
+        await _channel.Writer.WriteAsync(upload.Id, cancellationToken);
 
-        return Result<MediaFileDto>.Success(MediaFileDto.FromEntity(mediaFile, catalogLabels));
+        return Result<MediaFileDto>.Success(MediaFileDto.FromEntity(upload, catalogLabels));
     }
 }

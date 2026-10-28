@@ -36,6 +36,7 @@ public static class ServiceCollectionExtensions
                 .AddInterceptors(sp.GetRequiredService<DomainEventDispatcherInterceptor>()));
         services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<IMediaRepo, MediaRepo>();
+        services.AddScoped<IMediaUploadRepo, MediaUploadRepo>();
         services.AddScoped<IMediaPolicyRepo, MediaPolicyRepo>();
         services.AddScoped<IContentTypeDetectionService, ContentTypeDetectionService>();
         services.AddScoped<IMediaUploadFileService, MediaUploadFileService>();
@@ -43,7 +44,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMediaScanOrchestrator, MediaScanOrchestrator>();
         services.AddScoped<IImageProcessingService, ImageProcessingService>();
         services.AddScoped<IMediaEventAccessService, MediaEventAccessService>();
-        services.AddScoped<MediaPublicUrlService>();
+        services.AddScoped<IMediaPublicUrlService, MediaPublicUrlService>();
         services.AddSingleton<IMediaEventChannel, MediaEventChannel>();
         services.AddSingleton<IMediaEventWaitService, MediaEventWaitService>();
         services.AddSingleton(_ => Channel.CreateUnbounded<MediaFileId>(new UnboundedChannelOptions { SingleReader = true }));

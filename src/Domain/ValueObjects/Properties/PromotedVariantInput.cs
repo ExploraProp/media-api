@@ -7,7 +7,6 @@ namespace Media.Domain.ValueObjects.Properties;
 /// </summary>
 public sealed record PromotedVariantInput(
     VariantType VariantType,
-    VariantUrl Url,
-    VariantDimension? Width,
-    VariantDimension? Height,
+    Link Url,
+    MediaVariantMetadata? Metadata,
     MediaFileSize FileSizeBytes);

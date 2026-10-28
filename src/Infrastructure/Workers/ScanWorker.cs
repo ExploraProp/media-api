@@ -49,29 +49,29 @@ public sealed class ScanWorker(
     private async Task ExecuteAsync(MediaFileId id, CancellationToken ct)
     {
         using var scope = scopeFactory.CreateScope();
-        var mediaRepo = scope.ServiceProvider.GetRequiredService<IMediaRepo>();
+        var mediaUploadRepo = scope.ServiceProvider.GetRequiredService<IMediaUploadRepo>();
         var scanService = scope.ServiceProvider.GetRequiredService<IScanService>();
         var scanOrchestrator = scope.ServiceProvider.GetRequiredService<IMediaScanOrchestrator>();
         var storageService = scope.ServiceProvider.GetRequiredService<IStorageService>();
         var deadLetterStore = scope.ServiceProvider.GetRequiredService<IDeadLetterStore>();
 
-        var mediaFileResult = await mediaRepo.GetByIdAsync(id, ct);
-        if (mediaFileResult.IsFailure)
+        var uploadResult = await mediaUploadRepo.GetByIdAsync(id, ct);
+        if (uploadResult.IsFailure)
         {
-            logger.LogWarning("MediaFile {MediaFileId} not found for scanning", id);
+            logger.LogWarning("MediaUpload {MediaFileId} not found for scanning", id);
             return;
         }
 
-        var mediaFile = mediaFileResult.Value!;
+        var upload = uploadResult.Value!;
 
-        var beginScanResult = mediaFile.BeginScan();
+        var beginScanResult = upload.BeginScan();
         if (beginScanResult.IsFailure)
         {
             logger.LogWarning("Cannot begin scan for {MediaFileId}: {Error}", id, beginScanResult.Error?.Code.Value);
             return;
         }
 
-        var saveResult = await mediaRepo.UpdateAsync(mediaFile, ct);
+        var saveResult = await mediaUploadRepo.UpdateAsync(upload, ct);
         if (saveResult.IsFailure)
         {
             logger.LogError("Failed to save scanning state for {MediaFileId}", id);
@@ -85,14 +85,14 @@ public sealed class ScanWorker(
         {
             if (attempt > 0)
             {
-                var incrementResult = mediaFile.IncrementScanAttempt();
+                var incrementResult = upload.IncrementScanAttempt();
                 if (incrementResult.IsFailure)
                 {
                     logger.LogWarning("Cannot increment scan attempt for {MediaFileId}: {Error}", id, incrementResult.Error?.Code.Value);
                     return;
                 }
 
-                await mediaRepo.UpdateAsync(mediaFile, ct);
+                await mediaUploadRepo.UpdateAsync(upload, ct);
 
                 await Task.Delay(delays[attempt - 1], timeProvider, ct);
             }
@@ -102,7 +102,7 @@ public sealed class ScanWorker(
                 using var scanCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
                 scanCts.CancelAfter(TimeSpan.FromSeconds(60));
 
-                var downloadResult = await storageService.DownloadFileAsync(mediaFile.QuarantinePath.Value, scanCts.Token);
+                var downloadResult = await storageService.DownloadFileAsync(upload.QuarantinePath.Value, scanCts.Token);
                 if (downloadResult.IsFailure)
                 {
                     logger.LogWarning("Failed to download file for scanning: {MediaFileId}, attempt {Attempt}", id, attempt + 1);

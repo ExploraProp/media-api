@@ -25,12 +25,9 @@ public static class OwnerTypeExtensions
 
     public static string ToI18nCode(this OwnerType ownerType) => EnumI18n.GetI18nCode(ownerType);
 
-    public static Result<OwnerType> TryParseOwnerType(string? value)
-    {
-        if (Enum.TryParse<OwnerType>(value, ignoreCase: true, out var parsed) &&
-            Enum.IsDefined(parsed))
-            return Result<OwnerType>.Success(parsed);
+    public static Result<OwnerType> TryParseOwnerType(string? value) =>
+        EnumParse.TryParse<OwnerType>(value, OwnerTypeError.Invalid, OwnerTypeError.Empty);
 
-        return Result<OwnerType>.Failure(OwnerTypeError.Invalid);
-    }
+    public static bool TryFromOrdinalOwnerType(string? value, out OwnerType result) =>
+        EnumParse.TryFromOrdinal(value, out result);
 }

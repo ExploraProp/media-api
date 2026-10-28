@@ -10,6 +10,10 @@ coverage-reports/
 .env
 **/.env
 
+# Six Labors ImageSharp license (use GitHub secret / .env in CI and local)
+sixlabors.lic
+**/sixlabors.lic
+
 # Ephemeral OpenAPI + Kiota client (api-scripts generate-client / test-functional)
 docs/openapi/apis/**/*.json
 clients/
@@ -22,3 +26,6 @@ artifacts/
 
 # Local commit helper (do not commit)
 git_commits.ps1
+
+# Reqnroll/SpecFlow generated code-behind
+*.feature.cs

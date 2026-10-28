@@ -5,7 +5,6 @@ namespace Media.API.Controllers;
 
 [ApiController]
 [ApiVersion("1.0")]
-[Route("api/v{version:apiVersion}/[controller]")]
 [Produces("application/json")]
 [Consumes("application/json")]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

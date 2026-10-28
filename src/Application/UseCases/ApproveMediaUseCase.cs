@@ -1,40 +1,61 @@
 using Media.Application.Commands;
 using Media.Application.Dto;
 using Media.Application.Services.Interfaces;
+using Media.Domain.Entities.Definitions;
 using Media.Domain.Repositories;
 using MediatR;
+using SharedKernel.Application.Services;
 using SharedKernel.Kernel.Results;
 using SharedKernel.Kernel.Results.Localization;
 
 namespace Media.Application.UseCases;
 
 public sealed class ApproveMediaUseCase(
+    IMediaUploadRepo mediaUploadRepo,
     IMediaRepo mediaRepo,
     IMediaPolicyRepo mediaPolicyRepo,
     IMediaPromotionService mediaPromotionService,
+    IStorageService storageService,
     ICatalogLabelLocalizer catalogLabels) : IRequestHandler<ApproveMediaCommand, Result<MediaFileDto>>
 {
     public async Task<Result<MediaFileDto>> Handle(ApproveMediaCommand command, CancellationToken cancellationToken)
     {
-        var mediaFileResult = await mediaRepo.GetByIdAsync(command.Id, cancellationToken);
-        if (mediaFileResult.IsFailure) return Result<MediaFileDto>.FromResult(mediaFileResult);
-        var mediaFile = mediaFileResult.Value!;
+        var uploadResult = await mediaUploadRepo.GetByIdAsync(command.Id, cancellationToken);
+        if (uploadResult.IsFailure) return Result<MediaFileDto>.FromResult(uploadResult);
+        var upload = uploadResult.Value!;
 
-        var policyResult = await mediaPolicyRepo.GetByOwnerTypeAsync(mediaFile.OwnerType, cancellationToken);
+        var approveResult = upload.Approve();
+        if (approveResult.IsFailure) return Result<MediaFileDto>.FromResult(approveResult);
+
+        var policyResult = await mediaPolicyRepo.GetByOwnerTypeAsync(upload.OwnerType, cancellationToken);
         if (policyResult.IsFailure) return Result<MediaFileDto>.FromResult(policyResult);
         var policy = policyResult.Value!;
 
-        var promotionResult = await mediaPromotionService.PromoteAsync(mediaFile, policy, cancellationToken);
+        var promotionResult = await mediaPromotionService.PromoteAsync(upload, policy, cancellationToken);
         if (promotionResult.IsFailure) return Result<MediaFileDto>.FromResult(promotionResult);
         var promotion = promotionResult.Value!;
 
-        var publicUrl = promotion.IsPublic ? promotion.PromotedUrl : null;
-        var approveResult = mediaFile.Approve(publicUrl, policy.AccessLevel, promotion.Variants);
-        if (approveResult.IsFailure) return Result<MediaFileDto>.FromResult(approveResult);
+        var accessLevel = policy.AccessLevel;
+        var mediaFileResult = MediaFile.Create(upload, accessLevel, promotion.Variants);
+        if (mediaFileResult.IsFailure) return Result<MediaFileDto>.FromResult(mediaFileResult);
+        var mediaFile = mediaFileResult.Value!;
 
-        var saveResult = await mediaRepo.UpdateAsync(mediaFile, cancellationToken);
-        if (saveResult.IsFailure) return Result<MediaFileDto>.FromResult(saveResult);
+        var addResult = await mediaRepo.AddAsync(mediaFile, cancellationToken);
+        if (addResult.IsFailure) return Result<MediaFileDto>.FromResult(addResult);
 
-        return Result<MediaFileDto>.Success(MediaFileDto.FromEntity(mediaFile, catalogLabels));
+        var hardDeleteResult = await mediaUploadRepo.HardDeleteAsync(upload.Id, cancellationToken);
+        if (hardDeleteResult.IsFailure) return Result<MediaFileDto>.FromResult(hardDeleteResult);
+
+        try
+        {
+            await storageService.DeleteFileAsync(upload.QuarantinePath.Value);
+        }
+        catch
+        {
+            // Quarantine blob cleanup is best-effort after successful promote.
+        }
+
+        return Result<MediaFileDto>.Success(
+            MediaFileDto.FromEntity(mediaFile, accessLevel, catalogLabels));
     }
 }
