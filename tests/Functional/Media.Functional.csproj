@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <!-- Local SharedKernel.Functional harness (ProjectReference). -->
-    <ProjectReference Include="..\..\..\..\tools\packages\SharedKernel\tests\Functional\SharedKernel.Functional.csproj" />
-    <ProjectReference Include="..\..\..\..\tools\packages\SharedKernel\src\ApiClient\SharedKernel.ApiClient.csproj" />
+    <PackageReference Include="SharedKernel.Functional" Version="2.0.37" />
+    <PackageReference Include="SharedKernel.ApiClient" Version="1.0.0" />
     <ProjectReference Include="..\..\src\API\Media.API.csproj" />
     <ProjectReference Include="..\..\clients\ExploraProp.Media.ApiClient\ExploraProp.Media.ApiClient.csproj" />
     <ProjectReference Include="..\..\..\session-api\clients\ExploraProp.Session.Internal.ApiClient\ExploraProp.Session.Internal.ApiClient.csproj" />
